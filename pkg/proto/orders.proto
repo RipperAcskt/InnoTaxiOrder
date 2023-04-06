@@ -1,12 +1,18 @@
 syntax = "proto3";
 
 option go_package = "pkg/proto";
-import "google/protobuf/empty.proto";
 
 message Params{
     string OrderID  = 1;
 }
 
+message Response {
+    string ID = 1;
+	string Name = 2;
+	string PhoneNumber = 3;
+	float Raiting = 4;
+}
+
 service OrderService{
-    rpc AddOrder(Params) returns (google.protobuf.Empty) {}
+    rpc AddOrder(Params) returns (Response) {}
 }
