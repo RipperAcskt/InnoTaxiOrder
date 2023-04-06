@@ -13,6 +13,7 @@ type Service struct {
 
 type Repo interface {
 	CreateOrder(ctx context.Context, order model.Order) error
+	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
 }
 
 func New(repo Repo, cfg *config.Config) *Service {
@@ -21,6 +22,10 @@ func New(repo Repo, cfg *config.Config) *Service {
 	}
 }
 
-func (s *Service) GetProfile(ctx context.Context, order model.Order) error {
+func (s *Service) Create(ctx context.Context, order model.Order) error {
 	return s.CreateOrder(ctx, order)
+}
+
+func (s *Service) GetOrder(ctx context.Context, indexes []string) ([]*model.Order, error) {
+	return s.GetOrders(ctx, indexes)
 }

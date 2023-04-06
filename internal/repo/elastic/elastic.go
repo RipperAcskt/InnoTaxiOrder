@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
@@ -83,14 +84,15 @@ func (es *Elastic) GetOrders(ctx context.Context, indexes []string) ([]*model.Or
 
 	var body bytes.Buffer
 	query := map[string]interface{}{
-		"query": map[string]interface{}{
-			"_id": indexes,
+		"ids": map[string]interface{}{
+			"values": indexes,
 		},
 	}
 	if err := json.NewEncoder(&body).Encode(query); err != nil {
 		return nil, fmt.Errorf("encode failed: %w", err)
 	}
-
+	b, _ := io.ReadAll(&body)
+	fmt.Println(string(b))
 	res, err := es.Client.Search(
 		es.Client.Search.WithContext(queryCtx),
 		es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
@@ -109,7 +111,7 @@ func (es *Elastic) parseInfo(res *esapi.Response) ([]*model.Order, error) {
 		var e map[string]interface{}
 		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
 			return nil, fmt.Errorf("decode failed: %w", err)
-		} else {
+		} else if err != nil {
 			return nil, fmt.Errorf("error: %w", err)
 		}
 	}
@@ -121,9 +123,9 @@ func (es *Elastic) parseInfo(res *esapi.Response) ([]*model.Order, error) {
 
 	var orders []*model.Order
 	for _, el := range info.Hits.Hits {
-		el.Source.ID = el.ID
-		orders = append(orders, &el.Source)
+		element := el
+		element.Source.ID = element.ID
+		orders = append(orders, &element.Source)
 	}
-
 	return orders, nil
 }

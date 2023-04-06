@@ -19,7 +19,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 		To:       input.To,
 	}
 
-	err := r.s.CreateOrder(ctx, info)
+	err := r.s.Create(ctx, info)
 	if err != nil {
 		return "error", fmt.Errorf("create order failed: %w", err)
 	}
@@ -39,7 +39,8 @@ func (r *mutationResolver) SetOrderState(ctx context.Context, input model.OrderS
 
 // GetOrders is the resolver for the GetOrders field.
 func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
-	panic(fmt.Errorf("not implemented: GetOrders - GetOrders"))
+	o, err := r.s.GetOrder(ctx, indexes)
+	return o, err
 }
 
 // Mutation returns graph.MutationResolver implementation.
