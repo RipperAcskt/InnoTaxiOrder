@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	AddOrder(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error)
+	FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error)
 }
 
 type orderServiceClient struct {
@@ -33,9 +33,9 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) AddOrder(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error) {
+func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/OrderService/AddOrder", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/OrderService/FindDriver", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *orderServiceClient) AddOrder(ctx context.Context, in *Params, opts ...g
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
-	AddOrder(context.Context, *Params) (*Response, error)
+	FindDriver(context.Context, *Params) (*Response, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -54,8 +54,8 @@ type OrderServiceServer interface {
 type UnimplementedOrderServiceServer struct {
 }
 
-func (UnimplementedOrderServiceServer) AddOrder(context.Context, *Params) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOrder not implemented")
+func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Params) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindDriver not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 
@@ -70,20 +70,20 @@ func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer)
 	s.RegisterService(&OrderService_ServiceDesc, srv)
 }
 
-func _OrderService_AddOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrderService_FindDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Params)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServiceServer).AddOrder(ctx, in)
+		return srv.(OrderServiceServer).FindDriver(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/OrderService/AddOrder",
+		FullMethod: "/OrderService/FindDriver",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AddOrder(ctx, req.(*Params))
+		return srv.(OrderServiceServer).FindDriver(ctx, req.(*Params))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +96,8 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddOrder",
-			Handler:    _OrderService_AddOrder_Handler,
+			MethodName: "FindDriver",
+			Handler:    _OrderService_FindDriver_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
