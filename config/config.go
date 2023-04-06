@@ -13,6 +13,8 @@ type Config struct {
 	ELASTIC_DB_NAME     string `mapstructure:"ELASTIC_DB_NAME"`
 
 	SERVER_HOST string `mapstructure:"SERVER_HOST"`
+
+	GRPC_USER_SERVICE_HOST string `mapstructure:"GRPC_USER_SERVICE_HOST"`
 }
 
 func New() (*Config, error) {

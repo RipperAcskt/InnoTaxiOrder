@@ -52,14 +52,17 @@ type ComplexityRoot struct {
 	}
 
 	Order struct {
-		Date     func(childComplexity int) int
-		DriverID func(childComplexity int) int
-		From     func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Status   func(childComplexity int) int
-		TaxiType func(childComplexity int) int
-		To       func(childComplexity int) int
-		UserID   func(childComplexity int) int
+		Date          func(childComplexity int) int
+		DriverID      func(childComplexity int) int
+		DriverName    func(childComplexity int) int
+		DriverPhone   func(childComplexity int) int
+		DriverRaiting func(childComplexity int) int
+		From          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Status        func(childComplexity int) int
+		TaxiType      func(childComplexity int) int
+		To            func(childComplexity int) int
+		UserID        func(childComplexity int) int
 	}
 
 	Query struct {
@@ -68,7 +71,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateOrder(ctx context.Context, input model.OrderInfo) (string, error)
+	CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error)
 	SetRaiting(ctx context.Context, input model.Raiting) (string, error)
 	SetOrderState(ctx context.Context, input model.OrderState) (string, error)
 }
@@ -140,6 +143,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.DriverID(childComplexity), true
+
+	case "Order.DriverName":
+		if e.complexity.Order.DriverName == nil {
+			break
+		}
+
+		return e.complexity.Order.DriverName(childComplexity), true
+
+	case "Order.DriverPhone":
+		if e.complexity.Order.DriverPhone == nil {
+			break
+		}
+
+		return e.complexity.Order.DriverPhone(childComplexity), true
+
+	case "Order.DriverRaiting":
+		if e.complexity.Order.DriverRaiting == nil {
+			break
+		}
+
+		return e.complexity.Order.DriverRaiting(childComplexity), true
 
 	case "Order.From":
 		if e.complexity.Order.From == nil {
@@ -424,9 +448,9 @@ func (ec *executionContext) _Mutation_CreateOrder(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Order)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_CreateOrder(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -436,7 +460,31 @@ func (ec *executionContext) fieldContext_Mutation_CreateOrder(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Order_ID(ctx, field)
+			case "UserID":
+				return ec.fieldContext_Order_UserID(ctx, field)
+			case "DriverID":
+				return ec.fieldContext_Order_DriverID(ctx, field)
+			case "DriverName":
+				return ec.fieldContext_Order_DriverName(ctx, field)
+			case "DriverPhone":
+				return ec.fieldContext_Order_DriverPhone(ctx, field)
+			case "DriverRaiting":
+				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "TaxiType":
+				return ec.fieldContext_Order_TaxiType(ctx, field)
+			case "From":
+				return ec.fieldContext_Order_From(ctx, field)
+			case "To":
+				return ec.fieldContext_Order_To(ctx, field)
+			case "Date":
+				return ec.fieldContext_Order_Date(ctx, field)
+			case "Status":
+				return ec.fieldContext_Order_Status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
 		},
 	}
 	defer func() {
@@ -690,6 +738,138 @@ func (ec *executionContext) fieldContext_Order_DriverID(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Order_DriverName(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_DriverName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DriverName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Order_DriverName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Order",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Order_DriverPhone(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_DriverPhone(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DriverPhone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Order_DriverPhone(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Order",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Order_DriverRaiting(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_DriverRaiting(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DriverRaiting, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Order_DriverRaiting(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Order",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -960,6 +1140,12 @@ func (ec *executionContext) fieldContext_Query_GetOrders(ctx context.Context, fi
 				return ec.fieldContext_Order_UserID(ctx, field)
 			case "DriverID":
 				return ec.fieldContext_Order_DriverID(ctx, field)
+			case "DriverName":
+				return ec.fieldContext_Order_DriverName(ctx, field)
+			case "DriverPhone":
+				return ec.fieldContext_Order_DriverPhone(ctx, field)
+			case "DriverRaiting":
+				return ec.fieldContext_Order_DriverRaiting(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -3102,6 +3288,27 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "DriverName":
+
+			out.Values[i] = ec._Order_DriverName(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "DriverPhone":
+
+			out.Values[i] = ec._Order_DriverPhone(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "DriverRaiting":
+
+			out.Values[i] = ec._Order_DriverRaiting(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "TaxiType":
 
 			out.Values[i] = ec._Order_TaxiType(ctx, field, obj)
@@ -3621,6 +3828,10 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNOrder2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrder(ctx context.Context, sel ast.SelectionSet, v model.Order) graphql.Marshaler {
+	return ec._Order(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNOrder2ᚕᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Order) graphql.Marshaler {

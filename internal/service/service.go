@@ -9,20 +9,22 @@ import (
 
 type Service struct {
 	Repo
+	*OrderService
 }
 
 type Repo interface {
-	CreateOrder(ctx context.Context, order model.Order) error
+	CreateOrder(ctx context.Context, order model.Order) (string, error)
 	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
 }
 
-func New(repo Repo, cfg *config.Config) *Service {
+func New(repo Repo, order Order, cfg *config.Config) *Service {
 	return &Service{
 		repo,
+		NewOrderService(order),
 	}
 }
 
-func (s *Service) Create(ctx context.Context, order model.Order) error {
+func (s *Service) Create(ctx context.Context, order model.Order) (string, error) {
 	return s.CreateOrder(ctx, order)
 }
 

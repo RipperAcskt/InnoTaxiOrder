@@ -4,6 +4,7 @@ option go_package = "pkg/proto";
 
 message Params{
     string OrderID  = 1;
+    string TaxiType  = 2;
 }
 
 message Response {

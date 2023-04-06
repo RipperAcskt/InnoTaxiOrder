@@ -15,6 +15,9 @@ type Order {
   ID: ID!
   UserID: ID!
   DriverID: ID!
+  DriverName: String!
+  DriverPhone: String!
+  DriverRaiting: Float!
   TaxiType: String!
   From: String!
   To: String!
@@ -43,7 +46,7 @@ input OrderState {
 }
 
 type Mutation {
-  CreateOrder(input: OrderInfo!): ID!
+  CreateOrder(input: OrderInfo!): Order!
   SetRaiting(input: Raiting!): ID!
   SetOrderState(input: OrderState!): ID!
 }

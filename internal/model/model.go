@@ -9,14 +9,17 @@ import (
 )
 
 type Order struct {
-	ID       string `json:"ID"`
-	UserID   string `json:"UserID"`
-	DriverID string `json:"DriverID"`
-	TaxiType string `json:"TaxiType"`
-	From     string `json:"From"`
-	To       string `json:"To"`
-	Date     string `json:"Date"`
-	Status   Status `json:"Status"`
+	ID            string  `json:"ID"`
+	UserID        string  `json:"UserID"`
+	DriverID      string  `json:"DriverID"`
+	DriverName    string  `json:"DriverName"`
+	DriverPhone   string  `json:"DriverPhone"`
+	DriverRaiting float32 `json:"DriverRaiting"`
+	TaxiType      string  `json:"TaxiType"`
+	From          string  `json:"From"`
+	To            string  `json:"To"`
+	Date          string  `json:"Date"`
+	Status        Status  `json:"Status"`
 }
 
 type OrderInfo struct {
