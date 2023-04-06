@@ -19,7 +19,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 		To:       input.To,
 	}
 
-	err := r.s.CreateOrder(ctx, info)
+	err := r.s.Create(ctx, info)
 	if err != nil {
 		return "error", fmt.Errorf("create order failed: %w", err)
 	}

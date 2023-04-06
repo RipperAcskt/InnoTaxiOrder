@@ -21,6 +21,6 @@ func New(repo Repo, cfg *config.Config) *Service {
 	}
 }
 
-func (s *Service) GetProfile(ctx context.Context, order model.Order) error {
+func (s *Service) Create(ctx context.Context, order model.Order) error {
 	return s.CreateOrder(ctx, order)
 }
