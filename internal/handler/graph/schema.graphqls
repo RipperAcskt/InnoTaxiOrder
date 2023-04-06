@@ -23,7 +23,7 @@ type Order {
 }
 
 type Query {
-  GetOrders: [Order!]!
+  GetOrders(indexes: [ID!]!): [Order!]!
 }
 
 input OrderInfo {

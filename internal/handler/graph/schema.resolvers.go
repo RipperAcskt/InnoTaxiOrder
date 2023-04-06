@@ -38,7 +38,7 @@ func (r *mutationResolver) SetOrderState(ctx context.Context, input model.OrderS
 }
 
 // GetOrders is the resolver for the GetOrders field.
-func (r *queryResolver) GetOrders(ctx context.Context) ([]*model.Order, error) {
+func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
 	panic(fmt.Errorf("not implemented: GetOrders - GetOrders"))
 }
 

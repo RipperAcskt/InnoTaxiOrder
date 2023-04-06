@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetOrders func(childComplexity int) int
+		GetOrders func(childComplexity int, indexes []string) int
 	}
 }
 
@@ -73,7 +73,7 @@ type MutationResolver interface {
 	SetOrderState(ctx context.Context, input model.OrderState) (string, error)
 }
 type QueryResolver interface {
-	GetOrders(ctx context.Context) ([]*model.Order, error)
+	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
 }
 
 type executableSchema struct {
@@ -188,7 +188,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.GetOrders(childComplexity), true
+		args, err := ec.field_Query_GetOrders_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetOrders(childComplexity, args["indexes"].([]string)), true
 
 	}
 	return 0, false
@@ -322,6 +327,21 @@ func (ec *executionContext) field_Mutation_SetRaiting_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetOrders_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["indexes"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("indexes"))
+		arg0, err = ec.unmarshalNID2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["indexes"] = arg0
 	return args, nil
 }
 
@@ -909,7 +929,7 @@ func (ec *executionContext) _Query_GetOrders(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetOrders(rctx)
+		return ec.resolvers.Query().GetOrders(rctx, fc.Args["indexes"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -953,6 +973,17 @@ func (ec *executionContext) fieldContext_Query_GetOrders(ctx context.Context, fi
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetOrders_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -3558,6 +3589,38 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNOrder2ᚕᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Order) graphql.Marshaler {
