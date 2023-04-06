@@ -39,13 +39,13 @@ func New(cfg *config.Config) (*Elastic, error) {
 	return &Elastic{es, cfg}, nil
 }
 
-func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) error {
+func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) (string, error) {
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	data, err := json.Marshal(order)
 	if err != nil {
-		return fmt.Errorf("marshal failed: %s", err)
+		return "", fmt.Errorf("marshal failed: %s", err)
 	}
 	req := esapi.IndexRequest{
 		Index:   es.cfg.ELASTIC_DB_NAME,
@@ -55,12 +55,12 @@ func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) error {
 
 	res, err := req.Do(queryCtx, es.Client)
 	if err != nil {
-		return fmt.Errorf("req do failed: %w", err)
+		return "", fmt.Errorf("req do failed: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.IsError() {
-		return fmt.Errorf("res error: %w", err)
+		return "", fmt.Errorf("res error: %w", err)
 	}
 
 	return nil
