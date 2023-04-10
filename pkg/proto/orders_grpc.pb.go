@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: pkg/proto/orders.proto
 
-package protroto
+package proto
 
 import (
 	context "context"
