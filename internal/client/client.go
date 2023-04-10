@@ -6,13 +6,13 @@ import (
 
 	"github.com/RipperAcskt/innotaxiorder/config"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
-	"github.com/RipperAcskt/innotaxiorder/pkg/proto"
+	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type User struct {
-	client proto.OrderServiceClient
+	client orderProto.OrderServiceClient
 	conn   *grpc.ClientConn
 	cfg    *config.Config
 }
@@ -33,13 +33,13 @@ func New(cfg *config.Config) (*User, error) {
 		return nil, fmt.Errorf("dial failed: %w", err)
 	}
 
-	client := proto.NewOrderServiceClient(conn)
+	client := orderProto.NewOrderServiceClient(conn)
 
 	return &User{client, conn, cfg}, nil
 }
 
 func (u *User) FindDriver(ctx context.Context, order OrderRequest) (*model.Order, error) {
-	request := &proto.Params{
+	request := &orderProto.Params{
 		OrderID:  order.Id,
 		TaxiType: order.TaxiType,
 	}
