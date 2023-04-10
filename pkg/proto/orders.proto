@@ -7,7 +7,7 @@ message Params{
     string TaxiType  = 2;
 }
 
-message Response {
+message Driver {
     string ID = 1;
 	string Name = 2;
 	string PhoneNumber = 3;
@@ -15,5 +15,5 @@ message Response {
 }
 
 service OrderService{
-    rpc FindDriver(Params) returns (Response) {}
+    rpc FindDriver(Params) returns (Driver) {}
 }

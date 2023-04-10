@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error)
+	FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Driver, error)
 }
 
 type orderServiceClient struct {
@@ -33,8 +33,8 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
+func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Driver, error) {
+	out := new(Driver)
 	err := c.cc.Invoke(ctx, "/OrderService/FindDriver", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,14 +46,14 @@ func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ..
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
-	FindDriver(context.Context, *Params) (*Response, error)
+	FindDriver(context.Context, *Params) (*Driver, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
-func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Params) (*Response, error) {
+func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Params) (*Driver, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindDriver not implemented")
 }
 
