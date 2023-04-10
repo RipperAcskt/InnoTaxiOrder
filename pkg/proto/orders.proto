@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "pkg/orderProto";
+option go_package = "pkg/protroto";
 
 message Params{
     string OrderID  = 1;
