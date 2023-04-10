@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	NotFoud = fmt.Errorf("not found")
+	ErrNotFoud = fmt.Errorf("not found")
 )
 
 // CreateOrder is the resolver for the CreateOrder field.
@@ -29,7 +29,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 	if err != nil {
 		return nil, fmt.Errorf("create order failed: %w", err)
 	}
-
+	fmt.Println(id)
 	order := client.OrderRequest{
 		Id:       id,
 		TaxiType: input.TaxiType,
@@ -38,12 +38,11 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 	select {
 	case err := <-r.s.Err:
 		if errors.Is(err, fmt.Errorf("driver does not exist")) {
-			return nil, NotFoud
+			return nil, ErrNotFoud
 		}
 		return nil, err
 	case info := <-r.s.Find:
 		return info, nil
-
 	}
 }
 

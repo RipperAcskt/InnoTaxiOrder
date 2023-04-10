@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
+	"github.com/RipperAcskt/innotaxiorder/internal/client"
 	"github.com/RipperAcskt/innotaxiorder/internal/handler/graph"
 	"github.com/RipperAcskt/innotaxiorder/internal/repo/elastic"
 	"github.com/RipperAcskt/innotaxiorder/internal/server"
@@ -36,7 +37,12 @@ func Run() error {
 
 	// fmt.Println(info)
 
-	service := service.New(repo, cfg)
+	client, err := client.New(cfg)
+	if err != nil {
+		return fmt.Errorf("client new failed: %v", err)
+	}
+
+	service := service.New(repo, client, cfg)
 	handler, err := graph.New(service, cfg, log)
 	if err != nil {
 		return fmt.Errorf("handler new failed: %w", err)

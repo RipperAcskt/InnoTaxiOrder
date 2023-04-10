@@ -18,9 +18,11 @@ type Repo interface {
 }
 
 func New(repo Repo, order Order, cfg *config.Config) *Service {
+	orderService := NewOrderService(order)
+	go orderService.Consumer()
 	return &Service{
 		repo,
-		NewOrderService(order),
+		orderService,
 	}
 }
 

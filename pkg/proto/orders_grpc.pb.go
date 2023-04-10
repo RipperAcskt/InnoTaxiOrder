@@ -43,21 +43,19 @@ func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ..
 }
 
 // OrderServiceServer is the server API for OrderService service.
-// All implementations must embed UnimplementedOrderServiceServer
+// All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
 	FindDriver(context.Context, *Params) (*Response, error)
-	mustEmbedUnimplementedOrderServiceServer()
 }
 
-// UnimplementedOrderServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
 func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Params) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindDriver not implemented")
 }
-func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 
 // UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to OrderServiceServer will

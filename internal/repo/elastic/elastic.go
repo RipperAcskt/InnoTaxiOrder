@@ -59,11 +59,23 @@ func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) (string, 
 	}
 	defer res.Body.Close()
 
+	var idStruct struct {
+		Id string `json:"_id"`
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", fmt.Errorf("read all failed: %w", err)
+	}
+	err = json.Unmarshal(body, &idStruct)
+	if err != nil {
+		return "", fmt.Errorf("unmarshal failed: %w", err)
+	}
+
 	if res.IsError() {
 		return "", fmt.Errorf("res error: %w", err)
 	}
 
-	return nil
+	return idStruct.Id, nil
 }
 
 func (es *Elastic) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
