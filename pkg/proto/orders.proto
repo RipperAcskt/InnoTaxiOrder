@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "pkg/orderProto";
 
-message Params{
+message Info{
     string OrderID  = 1;
     string TaxiType  = 2;
 }
@@ -15,5 +15,5 @@ message Driver {
 }
 
 service OrderService{
-    rpc FindDriver(Params) returns (Driver) {}
+    rpc FindDriver(Info) returns (Driver) {}
 }

@@ -39,7 +39,7 @@ func New(cfg *config.Config) (*User, error) {
 }
 
 func (u *User) FindDriver(ctx context.Context, order OrderRequest) (*model.Order, error) {
-	request := &orderProto.Params{
+	request := &orderProto.Info{
 		OrderID:  order.Id,
 		TaxiType: order.TaxiType,
 	}

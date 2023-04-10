@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Driver, error)
+	FindDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Driver, error)
 }
 
 type orderServiceClient struct {
@@ -33,7 +33,7 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Driver, error) {
+func (c *orderServiceClient) FindDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Driver, error) {
 	out := new(Driver)
 	err := c.cc.Invoke(ctx, "/OrderService/FindDriver", in, out, opts...)
 	if err != nil {
@@ -46,14 +46,14 @@ func (c *orderServiceClient) FindDriver(ctx context.Context, in *Params, opts ..
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
-	FindDriver(context.Context, *Params) (*Driver, error)
+	FindDriver(context.Context, *Info) (*Driver, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
-func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Params) (*Driver, error) {
+func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Info) (*Driver, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindDriver not implemented")
 }
 
@@ -69,7 +69,7 @@ func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer)
 }
 
 func _OrderService_FindDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
+	in := new(Info)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func _OrderService_FindDriver_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/OrderService/FindDriver",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).FindDriver(ctx, req.(*Params))
+		return srv.(OrderServiceServer).FindDriver(ctx, req.(*Info))
 	}
 	return interceptor(ctx, in, info, handler)
 }
