@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "pkg/orderProto";
 
 message Info{
-    repeated Driver drivers = 1;
+    repeated Driver Drivers = 1;
 }
 
 message Driver {
