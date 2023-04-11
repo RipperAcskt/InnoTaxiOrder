@@ -11,8 +11,12 @@ import (
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 )
 
+var (
+	ErrNotFoud = fmt.Errorf("not found")
+)
+
 // CreateOrder is the resolver for the CreateOrder field.
-func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInfo) (string, error) {
+func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error) {
 	info := model.Order{
 		TaxiType: input.TaxiType,
 		From:     input.From,
@@ -21,10 +25,9 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 
 	err := r.s.Create(ctx, info)
 	if err != nil {
-		return "error", fmt.Errorf("create order failed: %w", err)
+		return nil, fmt.Errorf("create order failed: %w", err)
 	}
-
-	return "success", nil
+	return nil, nil
 }
 
 // SetRaiting is the resolver for the SetRaiting field.
@@ -38,8 +41,9 @@ func (r *mutationResolver) SetOrderState(ctx context.Context, input model.OrderS
 }
 
 // GetOrders is the resolver for the GetOrders field.
-func (r *queryResolver) GetOrders(ctx context.Context) ([]*model.Order, error) {
-	panic(fmt.Errorf("not implemented: GetOrders - GetOrders"))
+func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
+	o, err := r.s.GetOrder(ctx, indexes)
+	return o, err
 }
 
 // Mutation returns graph.MutationResolver implementation.

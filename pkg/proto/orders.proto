@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "pkg/orderProto";
+
+message Info{
+    repeated Driver Drivers = 1;
+}
+
+message Driver {
+    string ID = 1;
+	string Name = 2;
+	string PhoneNumber = 3;
+    string TaxiType = 4;
+	float Raiting = 5;
+}
+
+service OrderService{
+    rpc SyncDriver(Info) returns (Info) {}
+}
