@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"github.com/RipperAcskt/innotaxiorder/internal/queue"
@@ -31,7 +30,6 @@ func NewOrderService(order Order, drivers []*orderProto.Driver) *OrderService {
 	os.drivers[model.Econom] = queue.New()
 	os.drivers[model.Comfort] = queue.New()
 	os.drivers[model.Business] = queue.New()
-	fmt.Println(os.drivers)
 	for _, driver := range drivers {
 		tmp := driver
 		os.drivers[driver.TaxiType].Append(tmp)

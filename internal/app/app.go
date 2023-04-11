@@ -31,13 +31,6 @@ func Run() error {
 		return fmt.Errorf("elastic new failed: %w", err)
 	}
 
-	// info, err := repo.GetOrders(context.Background())
-	// if err != nil {
-	// 	return fmt.Errorf("get orders failed: %w", err)
-	// }
-
-	// fmt.Println(info)
-
 	client, err := client.New(cfg)
 	if err != nil {
 		return fmt.Errorf("client new failed: %v", err)
@@ -47,7 +40,7 @@ func Run() error {
 	if err != nil {
 		return fmt.Errorf("can't sync drivers: %w", err)
 	}
-	fmt.Println(drivers)
+	// fmt.Println(drivers)
 	service := service.New(repo, client, drivers, cfg)
 	handler, err := graph.New(service, cfg, log)
 	if err != nil {
