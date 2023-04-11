@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
+	"strings"
 	"time"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
@@ -39,13 +39,14 @@ func New(cfg *config.Config) (*Elastic, error) {
 	return &Elastic{es, cfg}, nil
 }
 
-func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) (string, error) {
+func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) error {
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	order.Status = model.StatusWaiting
 	data, err := json.Marshal(order)
 	if err != nil {
-		return "", fmt.Errorf("marshal failed: %s", err)
+		return fmt.Errorf("marshal failed: %s", err)
 	}
 	req := esapi.IndexRequest{
 		Index:   es.cfg.ELASTIC_DB_NAME,
@@ -55,27 +56,15 @@ func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) (string, 
 
 	res, err := req.Do(queryCtx, es.Client)
 	if err != nil {
-		return "", fmt.Errorf("req do failed: %w", err)
+		return fmt.Errorf("req do failed: %w", err)
 	}
 	defer res.Body.Close()
 
-	var idStruct struct {
-		Id string `json:"_id"`
-	}
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", fmt.Errorf("read all failed: %w", err)
-	}
-	err = json.Unmarshal(body, &idStruct)
-	if err != nil {
-		return "", fmt.Errorf("unmarshal failed: %w", err)
-	}
-
 	if res.IsError() {
-		return "", fmt.Errorf("res error: %w", err)
+		return fmt.Errorf("res error: %w", err)
 	}
 
-	return idStruct.Id, nil
+	return nil
 }
 
 func (es *Elastic) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
@@ -103,8 +92,7 @@ func (es *Elastic) GetOrders(ctx context.Context, indexes []string) ([]*model.Or
 	if err := json.NewEncoder(&body).Encode(query); err != nil {
 		return nil, fmt.Errorf("encode failed: %w", err)
 	}
-	b, _ := io.ReadAll(&body)
-	fmt.Println(string(b))
+
 	res, err := es.Client.Search(
 		es.Client.Search.WithContext(queryCtx),
 		es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
@@ -140,4 +128,80 @@ func (es *Elastic) parseInfo(res *esapi.Response) ([]*model.Order, error) {
 		orders = append(orders, &element.Source)
 	}
 	return orders, nil
+}
+
+func (es *Elastic) GetWaiting(ctx context.Context, taxiType string) ([]*model.Order, error) {
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var body bytes.Buffer
+	query := map[string]interface{}{
+		"filter": map[string]interface{}{
+			"term": map[string]interface{}{
+				"Status":   "waiting",
+				"TaxiType": taxiType,
+			},
+		},
+		"sort": map[string]interface{}{
+			"Date": "desc",
+		},
+	}
+	if err := json.NewEncoder(&body).Encode(query); err != nil {
+		return nil, fmt.Errorf("encode failed: %w", err)
+	}
+
+	res, err := es.Client.Search(
+		es.Client.Search.WithContext(queryCtx),
+		es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
+		es.Client.Search.WithBody(&body),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("search failed: %w", err)
+	}
+	defer res.Body.Close()
+	return es.parseInfo(res)
+
+}
+
+func (es *Elastic) UpdateOrder(ctx context.Context, order *model.Order) ([]*model.Order, error) {
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var body bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"term": map[string]interface{}{
+				"UserID": order.UserID,
+				"Status": model.StatusWaiting,
+			},
+		},
+		"script": map[string]interface{}{
+			"DriverID":      order.DriverID,
+			"DriverName":    order.DriverName,
+			"DriverPhone":   order.DriverPhone,
+			"DriverRaiting": order.DriverRaiting,
+			"Status":        model.StatusFound,
+		},
+	}
+	if err := json.NewEncoder(&body).Encode(query); err != nil {
+		return nil, fmt.Errorf("encode failed: %w", err)
+	}
+
+	req := esapi.UpdateRequest{
+		Index: es.cfg.ELASTIC_DB_NAME,
+		Body:  strings.NewReader(fmt.Sprintf(`{"doc": %v}`, body)),
+	}
+
+	res, err := req.Do(queryCtx, es.Client)
+	if err != nil {
+		return nil, fmt.Errorf("req do failed: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		return nil, fmt.Errorf("res error: %w", err)
+	}
+
+	return es.parseInfo(res)
+
 }

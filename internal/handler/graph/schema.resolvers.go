@@ -6,10 +6,8 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/RipperAcskt/innotaxiorder/internal/client"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 )
 
@@ -25,25 +23,11 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 		To:       input.To,
 	}
 
-	id, err := r.s.Create(ctx, info)
+	err := r.s.Create(ctx, info)
 	if err != nil {
 		return nil, fmt.Errorf("create order failed: %w", err)
 	}
-	fmt.Println(id)
-	order := client.OrderRequest{
-		Id:       id,
-		TaxiType: input.TaxiType,
-	}
-	r.s.New <- order
-	select {
-	case err := <-r.s.Err:
-		if errors.Is(err, fmt.Errorf("driver does not exist")) {
-			return nil, ErrNotFoud
-		}
-		return nil, err
-	case info := <-r.s.Find:
-		return info, nil
-	}
+	return nil, nil
 }
 
 // SetRaiting is the resolver for the SetRaiting field.

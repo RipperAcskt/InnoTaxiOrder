@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -42,7 +43,12 @@ func Run() error {
 		return fmt.Errorf("client new failed: %v", err)
 	}
 
-	service := service.New(repo, client, cfg)
+	drivers, err := client.SyncDriver(context.Background(), nil)
+	if err != nil {
+		return fmt.Errorf("can't sync drivers: %w", err)
+	}
+	fmt.Println(drivers)
+	service := service.New(repo, client, drivers, cfg)
 	handler, err := graph.New(service, cfg, log)
 	if err != nil {
 		return fmt.Errorf("handler new failed: %w", err)

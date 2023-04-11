@@ -48,6 +48,12 @@ type ElasticModel struct{
 	
 }
 
+const (
+	Econom string = "econom"
+	Comfort string = "comfort"
+	Business string = "business"
+)
+
 type Status string
 
 const (

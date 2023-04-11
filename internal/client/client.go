@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
-	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -38,16 +37,21 @@ func New(cfg *config.Config) (*User, error) {
 	return &User{client, conn, cfg}, nil
 }
 
-func (u *User) SyncDriver(ctx context.Context, order orderProto.Info) (*model.Order, error) {
+func (u *User) SyncDriver(ctx context.Context, drivers []*orderProto.Driver) ([]*orderProto.Driver, error) {
 	request := &orderProto.Info{
-		OrderID:  order.Id,
-		TaxiType: order.TaxiType,
+		Drivers: drivers,
 	}
 	response, err := u.client.SyncDriver(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("find driver failed: %w", err)
 	}
-	return &model.Order{DriverID: response.ID, DriverName: response.Name, DriverPhone: response.PhoneNumber, DriverRaiting: response.Raiting}, nil
+
+	var syncDrivers []*orderProto.Driver
+	for _, driver := range response.Drivers {
+		d := driver
+		syncDrivers = append(syncDrivers, d)
+	}
+	return syncDrivers, nil
 }
 
 func (u *User) Close() error {
