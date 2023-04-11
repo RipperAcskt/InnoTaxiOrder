@@ -14,7 +14,9 @@ type Order interface {
 
 type OrderService struct {
 	Order
-	orders []client.OrderRequest
+	econom []client.OrderRequest
+	comfort []
+	business []
 	New    chan client.OrderRequest
 	Err    chan error
 	Find   chan *model.Order

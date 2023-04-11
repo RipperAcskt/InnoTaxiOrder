@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	FindDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Driver, error)
+	SyncDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Info, error)
 }
 
 type orderServiceClient struct {
@@ -33,9 +33,9 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) FindDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Driver, error) {
-	out := new(Driver)
-	err := c.cc.Invoke(ctx, "/OrderService/FindDriver", in, out, opts...)
+func (c *orderServiceClient) SyncDriver(ctx context.Context, in *Info, opts ...grpc.CallOption) (*Info, error) {
+	out := new(Info)
+	err := c.cc.Invoke(ctx, "/OrderService/SyncDriver", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,15 +46,15 @@ func (c *orderServiceClient) FindDriver(ctx context.Context, in *Info, opts ...g
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
-	FindDriver(context.Context, *Info) (*Driver, error)
+	SyncDriver(context.Context, *Info) (*Info, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
-func (UnimplementedOrderServiceServer) FindDriver(context.Context, *Info) (*Driver, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindDriver not implemented")
+func (UnimplementedOrderServiceServer) SyncDriver(context.Context, *Info) (*Info, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncDriver not implemented")
 }
 
 // UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -68,20 +68,20 @@ func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer)
 	s.RegisterService(&OrderService_ServiceDesc, srv)
 }
 
-func _OrderService_FindDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _OrderService_SyncDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Info)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServiceServer).FindDriver(ctx, in)
+		return srv.(OrderServiceServer).SyncDriver(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/OrderService/FindDriver",
+		FullMethod: "/OrderService/SyncDriver",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).FindDriver(ctx, req.(*Info))
+		return srv.(OrderServiceServer).SyncDriver(ctx, req.(*Info))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -94,8 +94,8 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FindDriver",
-			Handler:    _OrderService_FindDriver_Handler,
+			MethodName: "SyncDriver",
+			Handler:    _OrderService_SyncDriver_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

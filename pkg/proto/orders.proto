@@ -3,8 +3,7 @@ syntax = "proto3";
 option go_package = "pkg/orderProto";
 
 message Info{
-    string OrderID  = 1;
-    string TaxiType  = 2;
+    repeated Driver drivers = 1;
 }
 
 message Driver {
@@ -15,5 +14,5 @@ message Driver {
 }
 
 service OrderService{
-    rpc FindDriver(Info) returns (Driver) {}
+    rpc SyncDriver(Info) returns (Info) {}
 }
