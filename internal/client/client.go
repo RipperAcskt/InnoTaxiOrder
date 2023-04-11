@@ -38,12 +38,12 @@ func New(cfg *config.Config) (*User, error) {
 	return &User{client, conn, cfg}, nil
 }
 
-func (u *User) FindDriver(ctx context.Context, order OrderRequest) (*model.Order, error) {
+func (u *User) SyncDriver(ctx context.Context, order orderProto.Info) (*model.Order, error) {
 	request := &orderProto.Info{
 		OrderID:  order.Id,
 		TaxiType: order.TaxiType,
 	}
-	response, err := u.client.FindDriver(ctx, request)
+	response, err := u.client.SyncDriver(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("find driver failed: %w", err)
 	}

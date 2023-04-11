@@ -10,7 +10,8 @@ message Driver {
     string ID = 1;
 	string Name = 2;
 	string PhoneNumber = 3;
-	float Raiting = 4;
+    string TaxiType = 4;
+	float Raiting = 5;
 }
 
 service OrderService{
