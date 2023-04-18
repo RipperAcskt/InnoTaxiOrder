@@ -36,12 +36,20 @@ func Run() error {
 		return fmt.Errorf("client new failed: %v", err)
 	}
 
-	drivers, err := client.SyncDriver(context.Background(), nil)
+	service := service.New(repo, client, cfg)
+	go service.Append()
+	go service.Get()
+	go service.TimeSync()
+	go func() {
+		err := <-service.Err
+		log.Error("error: ", zap.Error(err))
+	}()
+
+	err = service.SyncDrivers(context.Background(), nil)
 	if err != nil {
-		return fmt.Errorf("can't sync drivers: %w", err)
+		return fmt.Errorf("sync drivers failed: %w", err)
 	}
-	// fmt.Println(drivers)
-	service := service.New(repo, client, drivers, cfg)
+
 	handler, err := graph.New(service, cfg, log)
 	if err != nil {
 		return fmt.Errorf("handler new failed: %w", err)

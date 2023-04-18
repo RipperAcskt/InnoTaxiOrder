@@ -1,42 +1,62 @@
 package service
 
 import (
-	"context"
-
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"github.com/RipperAcskt/innotaxiorder/internal/queue"
 	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 )
 
-type Order interface {
-	SyncDriver(ctx context.Context, drivers []*orderProto.Driver) ([]*orderProto.Driver, error)
-}
-
 type OrderService struct {
-	Order
-	drivers map[string]*queue.Queue
-	New     chan *orderProto.Driver
-	Err     chan error
-	Find    chan *model.Order
+	driversQueue map[string]*queue.Queue
+	Push         chan *orderProto.Driver
+	Pop          map[string]chan *orderProto.Driver
 }
 
-func NewOrderService(order Order, drivers []*orderProto.Driver) *OrderService {
+func newOrderService() *OrderService {
 	os := OrderService{
-		order,
-		make(map[string]*queue.Queue),
-		make(chan *orderProto.Driver),
-		make(chan error),
-		make(chan *model.Order)}
-	os.drivers[model.Econom] = queue.New()
-	os.drivers[model.Comfort] = queue.New()
-	os.drivers[model.Business] = queue.New()
-	for _, driver := range drivers {
-		tmp := driver
-		os.drivers[driver.TaxiType].Append(tmp)
+		driversQueue: map[string]*queue.Queue{},
+		Push:         make(chan *orderProto.Driver),
+		Pop:          map[string]chan *orderProto.Driver{},
 	}
+
+	os.driversQueue[model.Econom] = queue.New()
+	os.driversQueue[model.Comfort] = queue.New()
+	os.driversQueue[model.Business] = queue.New()
+
+	os.Pop[model.Econom] = make(chan *orderProto.Driver)
+	os.Pop[model.Comfort] = make(chan *orderProto.Driver)
+	os.Pop[model.Business] = make(chan *orderProto.Driver)
 	return &os
 }
 
-func (o *OrderService) FindDriver(order *model.Order) *orderProto.Driver {
-	return o.drivers[order.TaxiType].Get()
+func (o *OrderService) Append() {
+	for {
+		driver := <-o.Push
+		o.driversQueue[driver.TaxiType].Append(driver)
+	}
+}
+
+func (o *OrderService) Get() {
+	go func() {
+		for {
+			d := o.driversQueue[model.Econom].Get()
+			o.Pop[model.Econom] <- d
+		}
+	}()
+	go func() {
+		for {
+			d := o.driversQueue[model.Comfort].Get()
+			o.Pop[model.Comfort] <- d
+		}
+	}()
+	go func() {
+		for {
+			d := o.driversQueue[model.Business].Get()
+			o.Pop[model.Business] <- d
+		}
+	}()
+}
+
+func (o *OrderService) findDriver(order *model.Order) *orderProto.Driver {
+	return <-o.Pop[order.TaxiType]
 }

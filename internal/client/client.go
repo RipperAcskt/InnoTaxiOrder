@@ -26,7 +26,7 @@ func New(cfg *config.Config) (*User, error) {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	conn, err := grpc.Dial(cfg.GRPC_USER_SERVICE_HOST, opts...)
+	conn, err := grpc.Dial(cfg.GRPC_DIVER_SERVICE_HOST, opts...)
 
 	if err != nil {
 		return nil, fmt.Errorf("dial failed: %w", err)

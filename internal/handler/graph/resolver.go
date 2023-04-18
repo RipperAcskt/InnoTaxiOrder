@@ -29,8 +29,8 @@ func (r *Resolver) InitRouters() *http.ServeMux {
 
 	mux := http.DefaultServeMux
 
-	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	mux.Handle("/query", srv)
+	mux.Handle("/", r.Log(playground.Handler("GraphQL playground", "/query")))
+	mux.Handle("/query", r.Log(r.VerifyToken(srv)))
 
 	return mux
 }

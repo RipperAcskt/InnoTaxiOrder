@@ -27,6 +27,7 @@ type Order {
 
 type Query {
   GetOrders(indexes: [ID!]!): [Order!]!
+  CheckStatus(index: ID!): Order!
 }
 
 input OrderInfo {

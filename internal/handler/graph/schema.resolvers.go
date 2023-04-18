@@ -11,9 +11,9 @@ import (
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 )
 
-var (
-	ErrNotFoud = fmt.Errorf("not found")
-)
+type key string
+
+const userId key = "id"
 
 // CreateOrder is the resolver for the CreateOrder field.
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error) {
@@ -23,11 +23,45 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 		To:       input.To,
 	}
 
-	err := r.s.Create(ctx, info)
+	id, ok := IdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("bad access token")
+	}
+
+	orders, err := r.s.GetOrderByID(ctx, id, model.StatusWaiting.String())
+	if err != nil {
+		return nil, fmt.Errorf("get order failed: %w", err)
+	}
+
+	if len(orders) != 0 {
+		return nil, fmt.Errorf("you already have order")
+	}
+
+	info.UserID = id
+	err = r.s.Create(ctx, info)
 	if err != nil {
 		return nil, fmt.Errorf("create order failed: %w", err)
 	}
-	return nil, nil
+
+	orders, err = r.s.GetOrderByID(ctx, id, model.StatusWaiting.String())
+	if err != nil {
+		return nil, fmt.Errorf("get order failed: %w", err)
+	}
+
+	if len(orders) == 0 {
+		return nil, fmt.Errorf("create order failed")
+	}
+
+	return orders[0], nil
+}
+
+func ContextWithId(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, userId, id)
+}
+
+func IdFromContext(ctx context.Context) (string, bool) {
+	id, ok := ctx.Value(userId).(string)
+	return id, ok
 }
 
 // SetRaiting is the resolver for the SetRaiting field.
@@ -44,6 +78,16 @@ func (r *mutationResolver) SetOrderState(ctx context.Context, input model.OrderS
 func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
 	o, err := r.s.GetOrder(ctx, indexes)
 	return o, err
+}
+
+// CheckStatus is the resolver for the CheckStatus field.
+func (r *queryResolver) CheckStatus(ctx context.Context, index string) (*model.Order, error) {
+	id, ok := IdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("bad access token")
+	}
+
+	return r.s.Find(ctx, id)
 }
 
 // Mutation returns graph.MutationResolver implementation.

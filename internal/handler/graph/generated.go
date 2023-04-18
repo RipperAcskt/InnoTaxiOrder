@@ -66,7 +66,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetOrders func(childComplexity int, indexes []string) int
+		CheckStatus func(childComplexity int, index string) int
+		GetOrders   func(childComplexity int, indexes []string) int
 	}
 }
 
@@ -77,6 +78,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
+	CheckStatus(ctx context.Context, index string) (*model.Order, error)
 }
 
 type executableSchema struct {
@@ -206,6 +208,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.UserID(childComplexity), true
+
+	case "Query.CheckStatus":
+		if e.complexity.Query.CheckStatus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_CheckStatus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CheckStatus(childComplexity, args["index"].(string)), true
 
 	case "Query.GetOrders":
 		if e.complexity.Query.GetOrders == nil {
@@ -351,6 +365,21 @@ func (ec *executionContext) field_Mutation_SetRaiting_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_CheckStatus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["index"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("index"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["index"] = arg0
 	return args, nil
 }
 
@@ -1168,6 +1197,85 @@ func (ec *executionContext) fieldContext_Query_GetOrders(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_GetOrders_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_CheckStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_CheckStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CheckStatus(rctx, fc.Args["index"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Order)
+	fc.Result = res
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrder(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_CheckStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Order_ID(ctx, field)
+			case "UserID":
+				return ec.fieldContext_Order_UserID(ctx, field)
+			case "DriverID":
+				return ec.fieldContext_Order_DriverID(ctx, field)
+			case "DriverName":
+				return ec.fieldContext_Order_DriverName(ctx, field)
+			case "DriverPhone":
+				return ec.fieldContext_Order_DriverPhone(ctx, field)
+			case "DriverRaiting":
+				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "TaxiType":
+				return ec.fieldContext_Order_TaxiType(ctx, field)
+			case "From":
+				return ec.fieldContext_Order_From(ctx, field)
+			case "To":
+				return ec.fieldContext_Order_To(ctx, field)
+			case "Date":
+				return ec.fieldContext_Order_Date(ctx, field)
+			case "Status":
+				return ec.fieldContext_Order_Status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_CheckStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3384,6 +3492,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_GetOrders(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "CheckStatus":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_CheckStatus(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

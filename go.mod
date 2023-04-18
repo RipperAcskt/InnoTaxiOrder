@@ -5,6 +5,8 @@ go 1.19
 require (
 	github.com/99designs/gqlgen v0.17.27
 	github.com/elastic/go-elasticsearch/v8 v8.7.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/spf13/viper v1.15.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/zap v1.24.0
