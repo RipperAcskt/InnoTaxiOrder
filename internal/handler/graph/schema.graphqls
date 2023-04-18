@@ -1,0 +1,54 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Date
+
+enum Status {
+  waiting
+  found
+  inProgress
+  finished
+  canceled
+}
+
+type Order {
+  ID: ID!
+  UserID: ID!
+  DriverID: ID!
+  DriverName: String!
+  DriverPhone: String!
+  DriverRaiting: Float!
+  TaxiType: String!
+  From: String!
+  To: String!
+  Date: Date!
+  Status: Status!
+}
+
+type Query {
+  GetOrders(indexes: [ID!]!): [Order!]!
+  CheckStatus(index: ID!): Order!
+}
+
+input OrderInfo {
+  TaxiType: String!
+  From: String!
+  To: String!
+}
+
+input Raiting {
+  ID: String!
+  Raiting: Float!
+}
+
+input OrderState {
+  ID: String!
+  State: Status!
+}
+
+type Mutation {
+  CreateOrder(input: OrderInfo!): Order!
+  SetRaiting(input: Raiting!): ID!
+  SetOrderState(input: OrderState!): ID!
+}
