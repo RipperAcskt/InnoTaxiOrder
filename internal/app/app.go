@@ -37,9 +37,7 @@ func Run() error {
 	}
 
 	service := service.New(repo, client, cfg)
-	go service.Append()
-	go service.Get()
-	go service.TimeSync()
+
 	go func() {
 		err := <-service.Err
 		log.Error("error: ", zap.Error(err))

@@ -36,13 +36,18 @@ type DriverService interface {
 
 func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
 	orderService := newOrderService()
-	return &Service{
+	service := &Service{
 		driver,
 		repo,
 		orderService,
 		make(chan error),
 		cfg,
 	}
+
+	go service.Append()
+	go service.Get()
+	go service.TimeSync()
+	return service
 }
 
 func (s *Service) Create(ctx context.Context, order model.Order) error {
@@ -98,7 +103,7 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 		return nil, fmt.Errorf("get orders by id failed: %w", err)
 	}
 	if len(orders) == 0 {
-		return nil, fmt.Errorf("you haven't any orders")
+		return nil, fmt.Errorf("you haven't any waiting orders")
 	}
 	order := orders[0]
 
