@@ -43,7 +43,7 @@ type Status string
 const (
 	StatusWaiting    Status = "waiting"
 	StatusFound      Status = "found"
-	StatusInProgress Status = "inProgress"
+	StatusInProgress Status = "in_progress"
 	StatusFinished   Status = "finished"
 	StatusCanceled   Status = "canceled"
 )

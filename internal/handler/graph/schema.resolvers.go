@@ -71,7 +71,11 @@ func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) 
 
 // CompleteOrder is the resolver for the CompleteOrder field.
 func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented: CompleteOrder - CompleteOrder"))
+	id, ok := IdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("bad access token")
+	}
+	return r.s.CompleteOrder(ctx, id)
 }
 
 // GetOrders is the resolver for the GetOrders field.

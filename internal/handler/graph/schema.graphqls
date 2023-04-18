@@ -7,7 +7,7 @@ scalar Date
 enum Status {
   waiting
   found
-  inProgress
+  in_progress
   finished
   canceled
 }

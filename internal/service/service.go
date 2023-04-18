@@ -153,3 +153,31 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 	}
 	return nil, ErrNotFoud
 }
+
+func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Order, error) {
+	orders, err := s.GetOrdersByUserID(ctx, userID, model.StatusInProgress.String())
+	if err != nil {
+		return nil, fmt.Errorf("get orders by id failed: %w", err)
+	}
+	if len(orders) == 0 {
+		return nil, fmt.Errorf("you haven't any orders")
+	}
+	order := orders[0]
+
+	order.Status = model.StatusFinished
+	err = s.UpdateOrder(ctx, order)
+	if err != nil {
+		return nil, fmt.Errorf("update order failed: %w", err)
+	}
+
+	driver := &orderProto.Driver{
+		ID:          order.DriverID,
+		Name:        order.DriverName,
+		PhoneNumber: order.DriverPhone,
+		Raiting:     float32(order.DriverRaiting),
+		TaxiType:    order.TaxiType,
+	}
+
+	s.Push <- driver
+	return order, nil
+}
