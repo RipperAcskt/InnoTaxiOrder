@@ -49,5 +49,5 @@ input OrderState {
 type Mutation {
   CreateOrder(input: OrderInfo!): Order!
   SetRaiting(input: Raiting!): ID!
-  SetOrderState(input: OrderState!): ID!
+  CompleteOrder(input: ID!): Order!
 }

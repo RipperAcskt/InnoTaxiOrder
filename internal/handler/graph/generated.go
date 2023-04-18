@@ -46,8 +46,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CompleteOrder func(childComplexity int, input string) int
 		CreateOrder   func(childComplexity int, input model.OrderInfo) int
-		SetOrderState func(childComplexity int, input model.OrderState) int
 		SetRaiting    func(childComplexity int, input model.Raiting) int
 	}
 
@@ -74,7 +74,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error)
 	SetRaiting(ctx context.Context, input model.Raiting) (string, error)
-	SetOrderState(ctx context.Context, input model.OrderState) (string, error)
+	CompleteOrder(ctx context.Context, input string) (*model.Order, error)
 }
 type QueryResolver interface {
 	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
@@ -96,6 +96,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.CompleteOrder":
+		if e.complexity.Mutation.CompleteOrder == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_CompleteOrder_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CompleteOrder(childComplexity, args["input"].(string)), true
+
 	case "Mutation.CreateOrder":
 		if e.complexity.Mutation.CreateOrder == nil {
 			break
@@ -107,18 +119,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateOrder(childComplexity, args["input"].(model.OrderInfo)), true
-
-	case "Mutation.SetOrderState":
-		if e.complexity.Mutation.SetOrderState == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_SetOrderState_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SetOrderState(childComplexity, args["input"].(model.OrderState)), true
 
 	case "Mutation.SetRaiting":
 		if e.complexity.Mutation.SetRaiting == nil {
@@ -323,13 +323,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_CreateOrder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_CompleteOrder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.OrderInfo
+	var arg0 string
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNOrderInfo2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderInfo(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -338,13 +338,13 @@ func (ec *executionContext) field_Mutation_CreateOrder_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_SetOrderState_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_CreateOrder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.OrderState
+	var arg0 model.OrderInfo
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNOrderState2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderState(ctx, tmp)
+		arg0, err = ec.unmarshalNOrderInfo2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderInfo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -585,8 +585,8 @@ func (ec *executionContext) fieldContext_Mutation_SetRaiting(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_SetOrderState(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_SetOrderState(ctx, field)
+func (ec *executionContext) _Mutation_CompleteOrder(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_CompleteOrder(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -599,7 +599,7 @@ func (ec *executionContext) _Mutation_SetOrderState(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetOrderState(rctx, fc.Args["input"].(model.OrderState))
+		return ec.resolvers.Mutation().CompleteOrder(rctx, fc.Args["input"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -611,19 +611,43 @@ func (ec *executionContext) _Mutation_SetOrderState(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Order)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNOrder2ᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrder(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_SetOrderState(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_CompleteOrder(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Order_ID(ctx, field)
+			case "UserID":
+				return ec.fieldContext_Order_UserID(ctx, field)
+			case "DriverID":
+				return ec.fieldContext_Order_DriverID(ctx, field)
+			case "DriverName":
+				return ec.fieldContext_Order_DriverName(ctx, field)
+			case "DriverPhone":
+				return ec.fieldContext_Order_DriverPhone(ctx, field)
+			case "DriverRaiting":
+				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "TaxiType":
+				return ec.fieldContext_Order_TaxiType(ctx, field)
+			case "From":
+				return ec.fieldContext_Order_From(ctx, field)
+			case "To":
+				return ec.fieldContext_Order_To(ctx, field)
+			case "Date":
+				return ec.fieldContext_Order_Date(ctx, field)
+			case "Status":
+				return ec.fieldContext_Order_Status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
 		},
 	}
 	defer func() {
@@ -633,7 +657,7 @@ func (ec *executionContext) fieldContext_Mutation_SetOrderState(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_SetOrderState_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_CompleteOrder_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3345,10 +3369,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "SetOrderState":
+		case "CompleteOrder":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_SetOrderState(ctx, field)
+				return ec._Mutation_CompleteOrder(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -4021,11 +4045,6 @@ func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋRipperAcsktᚋinnota
 
 func (ec *executionContext) unmarshalNOrderInfo2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderInfo(ctx context.Context, v interface{}) (model.OrderInfo, error) {
 	res, err := ec.unmarshalInputOrderInfo(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNOrderState2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderState(ctx context.Context, v interface{}) (model.OrderState, error) {
-	res, err := ec.unmarshalInputOrderState(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

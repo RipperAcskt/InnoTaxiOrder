@@ -69,9 +69,9 @@ func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) 
 	panic(fmt.Errorf("not implemented: SetRaiting - SetRaiting"))
 }
 
-// SetOrderState is the resolver for the SetOrderState field.
-func (r *mutationResolver) SetOrderState(ctx context.Context, input model.OrderState) (string, error) {
-	panic(fmt.Errorf("not implemented: SetOrderState - SetOrderState"))
+// CompleteOrder is the resolver for the CompleteOrder field.
+func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented: CompleteOrder - CompleteOrder"))
 }
 
 // GetOrders is the resolver for the GetOrders field.
