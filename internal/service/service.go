@@ -144,6 +144,11 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 	}
 
 	if foundOrder != nil {
+		foundOrder.Status = model.StatusInProgress
+		err = s.UpdateOrder(ctx, foundOrder)
+		if err != nil {
+			return nil, fmt.Errorf("update order failed: %w", err)
+		}
 		return foundOrder, nil
 	}
 	return nil, ErrNotFoud

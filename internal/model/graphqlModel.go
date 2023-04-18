@@ -44,19 +44,21 @@ const (
 	StatusWaiting    Status = "waiting"
 	StatusFound      Status = "found"
 	StatusInProgress Status = "inProgress"
-	StatusDeleted    Status = "deleted"
+	StatusFinished   Status = "finished"
+	StatusCanceled   Status = "canceled"
 )
 
 var AllStatus = []Status{
 	StatusWaiting,
 	StatusFound,
 	StatusInProgress,
-	StatusDeleted,
+	StatusFinished,
+	StatusCanceled,
 }
 
 func (e Status) IsValid() bool {
 	switch e {
-	case StatusWaiting, StatusFound, StatusInProgress, StatusDeleted:
+	case StatusWaiting, StatusFound, StatusInProgress, StatusFinished, StatusCanceled:
 		return true
 	}
 	return false
