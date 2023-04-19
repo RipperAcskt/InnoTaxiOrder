@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/RipperAcskt/innotaxi/pkg/proto"
 	"github.com/RipperAcskt/innotaxiorder/config"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
-	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 )
 
 var (
@@ -31,7 +31,7 @@ type Repo interface {
 }
 
 type DriverService interface {
-	SyncDriver(ctx context.Context, drivers []*orderProto.Driver) ([]*orderProto.Driver, error)
+	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
 }
 
 func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
@@ -85,7 +85,7 @@ func (s *Service) TimeSync() {
 
 }
 
-func (s *Service) SyncDrivers(ctx context.Context, drivers []*orderProto.Driver) error {
+func (s *Service) SyncDrivers(ctx context.Context, drivers []*proto.Driver) error {
 	drivers, err := s.SyncDriver(ctx, drivers)
 	if err != nil {
 		return fmt.Errorf("can't sync drivers: %w", err)
@@ -175,7 +175,7 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 		return nil, fmt.Errorf("update order failed: %w", err)
 	}
 
-	driver := &orderProto.Driver{
+	driver := &proto.Driver{
 		ID:          order.DriverID,
 		Name:        order.DriverName,
 		PhoneNumber: order.DriverPhone,

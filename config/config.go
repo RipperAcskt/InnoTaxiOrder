@@ -14,6 +14,7 @@ type Config struct {
 
 	SERVER_HOST string `mapstructure:"SERVER_HOST"`
 
+	GRPC_USER_SERVICE_HOST  string `mapstructure:"GRPC_DIVER_SERVICE_HOST"`
 	GRPC_DIVER_SERVICE_HOST string `mapstructure:"GRPC_DIVER_SERVICE_HOST"`
 
 	HS256_SECRET string `mapstructure:"HS256_SECRET"`

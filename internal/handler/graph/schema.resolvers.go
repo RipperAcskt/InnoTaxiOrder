@@ -9,11 +9,13 @@ import (
 	"fmt"
 
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
+	"github.com/RipperAcskt/innotaxiorder/internal/service"
 )
 
 type key string
 
 const userId key = "id"
+const userType key = "type"
 
 // CreateOrder is the resolver for the CreateOrder field.
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error) {
@@ -23,7 +25,15 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 		To:       input.To,
 	}
 
-	id, ok := IdFromContext(ctx)
+	userType, ok := FromContext(ctx, userType)
+	if !ok {
+		return nil, fmt.Errorf("bad type")
+	}
+	if userType != "user" {
+		return nil, service.ErrValidation
+	}
+
+	id, ok := FromContext(ctx, userId)
 	if !ok {
 		return nil, fmt.Errorf("bad access token")
 	}
@@ -55,12 +65,12 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 	return orders[0], nil
 }
 
-func ContextWithId(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, userId, id)
+func ContextWithId(ctx context.Context, k key, id string) context.Context {
+	return context.WithValue(ctx, k, id)
 }
 
-func IdFromContext(ctx context.Context) (string, bool) {
-	id, ok := ctx.Value(userId).(string)
+func FromContext(ctx context.Context, k key) (string, bool) {
+	id, ok := ctx.Value(k).(string)
 	return id, ok
 }
 
@@ -71,9 +81,17 @@ func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) 
 
 // CompleteOrder is the resolver for the CompleteOrder field.
 func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*model.Order, error) {
-	id, ok := IdFromContext(ctx)
+	id, ok := FromContext(ctx, userId)
 	if !ok {
 		return nil, fmt.Errorf("bad access token")
+	}
+
+	userType, ok := FromContext(ctx, userType)
+	if !ok {
+		return nil, fmt.Errorf("bad type")
+	}
+	if userType != "user" {
+		return nil, service.ErrValidation
 	}
 	return r.s.CompleteOrder(ctx, id)
 }
@@ -86,9 +104,17 @@ func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*mod
 
 // CheckStatus is the resolver for the CheckStatus field.
 func (r *queryResolver) CheckStatus(ctx context.Context, index string) (*model.Order, error) {
-	id, ok := IdFromContext(ctx)
+	id, ok := FromContext(ctx, userId)
 	if !ok {
 		return nil, fmt.Errorf("bad access token")
+	}
+
+	userType, ok := FromContext(ctx, userType)
+	if !ok {
+		return nil, fmt.Errorf("bad type")
+	}
+	if userType != "user" {
+		return nil, service.ErrValidation
 	}
 
 	return r.s.Find(ctx, id)

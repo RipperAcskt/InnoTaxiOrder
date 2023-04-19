@@ -1,31 +1,31 @@
 package service
 
 import (
+	"github.com/RipperAcskt/innotaxi/pkg/proto"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"github.com/RipperAcskt/innotaxiorder/internal/queue"
-	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 )
 
 type OrderService struct {
 	driversQueue map[string]*queue.Queue
-	Push         chan *orderProto.Driver
-	Pop          map[string]chan *orderProto.Driver
+	Push         chan *proto.Driver
+	Pop          map[string]chan *proto.Driver
 }
 
 func newOrderService() *OrderService {
 	os := OrderService{
 		driversQueue: map[string]*queue.Queue{},
-		Push:         make(chan *orderProto.Driver),
-		Pop:          map[string]chan *orderProto.Driver{},
+		Push:         make(chan *proto.Driver),
+		Pop:          map[string]chan *proto.Driver{},
 	}
 
 	os.driversQueue[model.Econom] = queue.New()
 	os.driversQueue[model.Comfort] = queue.New()
 	os.driversQueue[model.Business] = queue.New()
 
-	os.Pop[model.Econom] = make(chan *orderProto.Driver)
-	os.Pop[model.Comfort] = make(chan *orderProto.Driver)
-	os.Pop[model.Business] = make(chan *orderProto.Driver)
+	os.Pop[model.Econom] = make(chan *proto.Driver)
+	os.Pop[model.Comfort] = make(chan *proto.Driver)
+	os.Pop[model.Business] = make(chan *proto.Driver)
 	return &os
 }
 
@@ -57,6 +57,6 @@ func (o *OrderService) Get() {
 	}()
 }
 
-func (o *OrderService) findDriver(order *model.Order) *orderProto.Driver {
+func (o *OrderService) findDriver(order *model.Order) *proto.Driver {
 	return <-o.Pop[order.TaxiType]
 }

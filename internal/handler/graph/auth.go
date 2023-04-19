@@ -48,7 +48,7 @@ func (res *Resolver) VerifyToken(handler http.Handler) http.Handler {
 		}
 		accessToken := token[1]
 
-		id, err := service.Verify(accessToken, res.Cfg)
+		info, err := service.Verify(accessToken, res.Cfg)
 		if err != nil {
 			if errors.Is(err, jwt.ValidationError{Errors: jwt.ValidationErrorExpired}) {
 				rw.WriteHeader(http.StatusUnauthorized)
@@ -130,7 +130,8 @@ func (res *Resolver) VerifyToken(handler http.Handler) http.Handler {
 			}
 			return
 		}
-		ctx := ContextWithId(r.Context(), id)
+		ctx := ContextWithId(r.Context(), userId, info.Id)
+		ctx = ContextWithId(ctx, userType, info.Type)
 		r = r.WithContext(ctx)
 		handler.ServeHTTP(rw, r)
 
