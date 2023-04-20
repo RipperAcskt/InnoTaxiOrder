@@ -2,8 +2,6 @@ module github.com/RipperAcskt/innotaxiorder
 
 go 1.19
 
-replace github.com/RipperAcskt/innotaxi => /Users/ripper/Desktop/programming/InnoTaxi/InnoTaxiUser
-
 require (
 	github.com/99designs/gqlgen v0.17.27
 	github.com/RipperAcskt/innotaxi v0.0.0-20230420094616-84e8bed9591e
