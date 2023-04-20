@@ -214,3 +214,21 @@ func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType s
 	}
 	return "", fmt.Errorf("order not found")
 }
+
+func (s *Service) CancelOrder(ctx context.Context, userID string) (*model.Order, error) {
+	orders, err := s.GetOrders(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("get orders by id failed: %w", err)
+	}
+	for _, order := range orders {
+		if order.UserID == userID && order.Status != model.StatusFinished && order.Status != model.StatusCanceled {
+			order.Status = model.StatusCanceled
+			err = s.UpdateOrder(ctx, order)
+			if err != nil {
+				return nil, fmt.Errorf("update order failed: %w", err)
+			}
+			return order, nil
+		}
+	}
+	return nil, fmt.Errorf("you haven't any orders")
+}

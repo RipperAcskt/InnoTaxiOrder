@@ -100,6 +100,23 @@ func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*mo
 	return r.s.CompleteOrder(ctx, id)
 }
 
+// CancelOrder is the resolver for the CancelOrder field.
+func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (*model.Order, error) {
+	userId, ok := FromContext(ctx, userId)
+	if !ok {
+		return nil, fmt.Errorf("bad access token")
+	}
+
+	userType, ok := FromContext(ctx, userType)
+	if !ok {
+		return nil, fmt.Errorf("bad type")
+	}
+	if userType != model.User {
+		return nil, service.ErrValidation
+	}
+	return r.s.CancelOrder(ctx, userId)
+}
+
 // GetOrders is the resolver for the GetOrders field.
 func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
 	o, err := r.s.GetOrder(ctx, indexes)
