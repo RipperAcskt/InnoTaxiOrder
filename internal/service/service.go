@@ -32,6 +32,7 @@ type Repo interface {
 
 type DriverService interface {
 	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
+	SetRaiting(ctx context.Context, raiting proto.Raiting, userType string) error
 }
 
 func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
@@ -185,4 +186,31 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 
 	s.Push <- driver
 	return order, nil
+}
+
+func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType string) (string, error) {
+	orders, err := s.GetOrders(ctx, nil)
+	if err != nil {
+		return "", fmt.Errorf("get orders failed: %w", err)
+	}
+
+	for i, order := range orders {
+		if i >= 5 {
+			break
+		}
+		if order.ID == input.ID {
+			var id string
+			if userType == model.User {
+				id = order.DriverID
+			} else {
+				id = order.UserID
+			}
+			rating := proto.Raiting{
+				ID:   id,
+				Mark: int64(input.Raiting),
+			}
+			return "", s.SetRaiting(ctx, rating, userType)
+		}
+	}
+	return "", fmt.Errorf("order not found")
 }

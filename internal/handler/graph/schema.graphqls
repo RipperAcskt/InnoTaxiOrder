@@ -39,7 +39,7 @@ input OrderInfo {
 
 input Raiting {
   ID: String!
-  Raiting: Float!
+  Raiting: Int!
 }
 
 input OrderState {

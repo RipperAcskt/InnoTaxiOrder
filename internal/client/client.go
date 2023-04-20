@@ -6,6 +6,7 @@ import (
 
 	"github.com/RipperAcskt/innotaxi/pkg/proto"
 	"github.com/RipperAcskt/innotaxiorder/config"
+	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -64,6 +65,22 @@ func (c *Clients) SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*p
 		syncDrivers = append(syncDrivers, d)
 	}
 	return syncDrivers, nil
+}
+
+func (c *Clients) SetRaiting(ctx context.Context, raiting proto.Raiting, userType string) error {
+	if userType == model.User {
+		_, err := c.driverClient.SetRaiting(ctx, &raiting)
+		if err != nil {
+			return fmt.Errorf("set raiting driver failed: %w", err)
+		}
+		return nil
+	}
+
+	_, err := c.userClient.SetRaiting(ctx, &raiting)
+	if err != nil {
+		return fmt.Errorf("set raiting user failed: %w", err)
+	}
+	return nil
 }
 
 func (c *Clients) Close() error {

@@ -13,4 +13,7 @@ const (
 	Econom   string = "econom"
 	Comfort  string = "comfort"
 	Business string = "business"
+
+	User   string = "user"
+	Driver string = "driver"
 )

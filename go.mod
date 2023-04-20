@@ -2,8 +2,11 @@ module github.com/RipperAcskt/innotaxiorder
 
 go 1.19
 
+replace github.com/RipperAcskt/innotaxi => /Users/ripper/Desktop/programming/InnoTaxi/InnoTaxiUser
+
 require (
 	github.com/99designs/gqlgen v0.17.27
+	github.com/RipperAcskt/innotaxi v0.0.0-20230420094616-84e8bed9591e
 	github.com/elastic/go-elasticsearch/v8 v8.7.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
@@ -11,11 +14,9 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.54.0
-	google.golang.org/protobuf v1.30.0
 )
 
 require (
-	github.com/RipperAcskt/innotaxi v0.0.0-20230419114149-da46840e3582 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -37,7 +38,7 @@ require (
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
+	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

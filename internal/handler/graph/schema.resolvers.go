@@ -29,7 +29,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != "user" {
+	if userType != model.User {
 		return nil, service.ErrValidation
 	}
 
@@ -76,7 +76,11 @@ func FromContext(ctx context.Context, k key) (string, bool) {
 
 // SetRaiting is the resolver for the SetRaiting field.
 func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) (string, error) {
-	panic(fmt.Errorf("not implemented: SetRaiting - SetRaiting"))
+	userType, ok := FromContext(ctx, userType)
+	if !ok {
+		return "", fmt.Errorf("bad type")
+	}
+	return r.s.SetRating(ctx, input, userType)
 }
 
 // CompleteOrder is the resolver for the CompleteOrder field.
@@ -90,7 +94,7 @@ func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*mo
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != "user" {
+	if userType != model.User {
 		return nil, service.ErrValidation
 	}
 	return r.s.CompleteOrder(ctx, id)
@@ -113,7 +117,7 @@ func (r *queryResolver) CheckStatus(ctx context.Context, index string) (*model.O
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != "user" {
+	if userType != model.User {
 		return nil, service.ErrValidation
 	}
 
