@@ -36,7 +36,7 @@ func (m *MockDriverService) EXPECT() *MockDriverServiceMockRecorder {
 }
 
 // SetRaiting mocks base method.
-func (m *MockDriverService) SetRaiting(arg0 context.Context, arg1 proto.Raiting, arg2 string) error {
+func (m *MockDriverService) SetRaiting(arg0 context.Context, arg1 *proto.Raiting, arg2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetRaiting", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
