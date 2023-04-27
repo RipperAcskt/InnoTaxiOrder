@@ -28,6 +28,7 @@ type Repo interface {
 	GetStatus(ctx context.Context, taxiType, status string) ([]*model.Order, error)
 	UpdateOrder(ctx context.Context, order *model.Order) error
 	GetOrdersByUserID(ctx context.Context, index string, status string) ([]*model.Order, error)
+	GetOrderByFilter(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error)
 }
 
 type DriverService interface {
@@ -52,7 +53,7 @@ func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
 }
 
 func (s *Service) Create(ctx context.Context, order model.Order) error {
-	order.Date = time.Now().UTC().String()
+	order.Date = time.Now().Format("2006-01-02 15:04:05")
 	return s.CreateOrder(ctx, order)
 }
 
@@ -158,6 +159,10 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 		return foundOrder, nil
 	}
 	return nil, ErrNotFoud
+}
+
+func (s *Service) GetOrdersList(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error) {
+	return s.GetOrderByFilter(ctx, filters, offset, limit)
 }
 
 func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Order, error) {

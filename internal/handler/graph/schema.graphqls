@@ -26,8 +26,18 @@ type Order {
   Status: Status!
 }
 
+input OrderFilters{
+  DriverID: ID!
+  UserID: ID!
+  From: String!
+  To: String!
+  FromDate: Date!
+  ToDate: Date!
+}
+
 type Query {
   GetOrders(indexes: [ID!]!): [Order!]!
+  GetOrdersList(info: OrderFilters!, offset: Int, limit: Int): [Order!]!
   CheckStatus(index: ID!): Order!
 }
 

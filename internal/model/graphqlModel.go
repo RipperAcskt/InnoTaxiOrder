@@ -22,6 +22,15 @@ type Order struct {
 	Status        Status  `json:"Status"`
 }
 
+type OrderFilters struct {
+	DriverID string `json:"DriverID"`
+	UserID   string `json:"UserID"`
+	From     string `json:"From"`
+	To       string `json:"To"`
+	FromDate string `json:"FromDate"`
+	ToDate   string `json:"ToDate"`
+}
+
 type OrderInfo struct {
 	TaxiType string `json:"TaxiType"`
 	From     string `json:"From"`

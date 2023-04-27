@@ -45,7 +45,22 @@ func New(cfg *config.Config) (*Elastic, error) {
 		return &Elastic{es, cfg}, nil
 	}
 
-	response, err = es.Indices.Create(cfg.ELASTIC_DB_NAME)
+	var body bytes.Buffer
+	query := map[string]interface{}{
+		"mappings": map[string]interface{}{
+			"properties": map[string]interface{}{
+				"Date": map[string]interface{}{
+					"type":   "date",
+					"format": "yyyy-MM-dd HH:mm:ss",
+				},
+			},
+		},
+	}
+	if err := json.NewEncoder(&body).Encode(query); err != nil {
+		return nil, fmt.Errorf("encode failed: %w", err)
+	}
+
+	response, err = es.Indices.Create(cfg.ELASTIC_DB_NAME, es.Indices.Create.WithBody(&body))
 	if err != nil {
 		return nil, fmt.Errorf("create failed: %w", err)
 	}
@@ -93,7 +108,7 @@ func (es *Elastic) CreateOrder(ctx context.Context, order model.Order) error {
 func (es *Elastic) GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error) {
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	fmt.Println(indexes)
+
 	if len(indexes) == 0 {
 		res, err := es.Client.Search(
 			es.Client.Search.WithContext(queryCtx),
@@ -273,4 +288,117 @@ func (es *Elastic) GetOrdersByUserID(ctx context.Context, index string, status s
 	}
 	defer res.Body.Close()
 	return es.parseInfo(res)
+}
+
+func (es *Elastic) GetOrderByFilter(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error) {
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var body bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"bool": map[string]interface{}{
+				"must": []map[string]interface{}{
+					{
+						"range": map[string]interface{}{
+							"Date": map[string]interface{}{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	query = es.createDate(filters, query)
+	query = es.createFilterQuery(filters, query)
+	fmt.Println(query)
+	if err := json.NewEncoder(&body).Encode(query); err != nil {
+		return nil, fmt.Errorf("encode failed: %w", err)
+	}
+
+	res, err := es.Client.Search(
+		es.Client.Search.WithContext(queryCtx),
+		es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
+		es.Client.Search.WithBody(&body),
+		es.Client.Search.WithFrom(offset),
+		es.Client.Search.WithSize(limit),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("search failed: %w", err)
+	}
+	defer res.Body.Close()
+	return es.parseInfo(res)
+}
+
+func (es *Elastic) createFilterQuery(filters model.OrderFilters, query map[string]interface{}) map[string]interface{} {
+	q := query["query"].(map[string]interface{})
+	b := q["bool"].(map[string]interface{})
+	must := b["must"].([]map[string]interface{})
+
+	if filters.DriverID != "" {
+		tmp := map[string]interface{}{
+			"match_phrase": map[string]interface{}{
+				"DriverID": filters.DriverID,
+			},
+		}
+		must = append(must, tmp)
+	}
+	if filters.UserID != "" {
+		tmp := map[string]interface{}{
+			"match": map[string]interface{}{
+				"UserID": filters.UserID,
+			},
+		}
+		must = append(must, tmp)
+	}
+	if filters.From != "" {
+		tmp := map[string]interface{}{
+			"match": map[string]interface{}{
+				"From": filters.From,
+			},
+		}
+		must = append(must, tmp)
+	}
+	if filters.To != "" {
+		tmp := map[string]interface{}{
+			"match": map[string]interface{}{
+				"To": filters.To,
+			},
+		}
+		must = append(must, tmp)
+	}
+
+	b["must"] = must
+	q["bool"] = b
+	query["query"] = q
+	return query
+}
+
+func (es *Elastic) createDate(filters model.OrderFilters, query map[string]interface{}) map[string]interface{} {
+	q := query["query"].(map[string]interface{})
+	b := q["bool"].(map[string]interface{})
+	must := b["must"].([]map[string]interface{})
+	r := must[0]["range"].(map[string]interface{})
+	if filters.FromDate != "" && filters.ToDate != "" {
+		tmp := map[string]interface{}{
+			"gte": filters.FromDate,
+			"lte": filters.ToDate,
+		}
+		r["Date"] = tmp
+	} else if filters.FromDate != "" {
+		tmp := map[string]interface{}{
+			"gte": filters.FromDate,
+		}
+		r["Date"] = tmp
+	} else if filters.ToDate != "" {
+		tmp := map[string]interface{}{
+			"lte": filters.ToDate,
+		}
+		r["Date"] = tmp
+	}
+	must[0]["range"] = r
+	b["must"] = must
+	q["bool"] = b
+	query["query"] = q
+	return query
 }
