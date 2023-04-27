@@ -7,7 +7,7 @@ scalar Date
 enum Status {
   waiting
   found
-  inProgress
+  in_progress
   finished
   canceled
 }
@@ -39,7 +39,7 @@ input OrderInfo {
 
 input Raiting {
   ID: String!
-  Raiting: Float!
+  Raiting: Int!
 }
 
 input OrderState {
@@ -50,5 +50,6 @@ input OrderState {
 type Mutation {
   CreateOrder(input: OrderInfo!): Order!
   SetRaiting(input: Raiting!): ID!
-  SetOrderState(input: OrderState!): ID!
+  CompleteOrder(input: ID!): Order!
+  CancelOrder(id: ID!): Order!
 }

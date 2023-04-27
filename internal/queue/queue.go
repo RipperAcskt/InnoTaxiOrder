@@ -3,23 +3,23 @@ package queue
 import (
 	"sync"
 
-	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
+	"github.com/RipperAcskt/innotaxi/pkg/proto"
 )
 
 type Queue struct {
-	Drivers    []*orderProto.Driver
-	lastDriver map[string]*orderProto.Driver
+	Drivers    []*proto.Driver
+	lastDriver map[string]*proto.Driver
 	mu         sync.RWMutex
 }
 
 func New() *Queue {
 	return &Queue{
-		Drivers:    make([]*orderProto.Driver, 0),
-		lastDriver: map[string]*orderProto.Driver{},
+		Drivers:    make([]*proto.Driver, 0),
+		lastDriver: map[string]*proto.Driver{},
 	}
 }
 
-func (q *Queue) Append(driver *orderProto.Driver) {
+func (q *Queue) Append(driver *proto.Driver) {
 	last := q.getLastDriver(driver.TaxiType)
 	if last != nil {
 		if last.ID == driver.ID {
@@ -34,7 +34,7 @@ func (q *Queue) Append(driver *orderProto.Driver) {
 	q.Drivers = append(q.Drivers, driver)
 }
 
-func (q *Queue) Get() *orderProto.Driver {
+func (q *Queue) Get() *proto.Driver {
 	if len(q.Drivers) == 0 {
 		return nil
 	}
@@ -44,13 +44,13 @@ func (q *Queue) Get() *orderProto.Driver {
 	return driver
 }
 
-func (q *Queue) setLastDriver(taxiType string, driver *orderProto.Driver) {
+func (q *Queue) setLastDriver(taxiType string, driver *proto.Driver) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.lastDriver[taxiType] = driver
 }
 
-func (q *Queue) getLastDriver(taxiType string) *orderProto.Driver {
+func (q *Queue) getLastDriver(taxiType string) *proto.Driver {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
 	return q.lastDriver[taxiType]

@@ -34,8 +34,8 @@ type OrderState struct {
 }
 
 type Raiting struct {
-	ID      string  `json:"ID"`
-	Raiting float64 `json:"Raiting"`
+	ID      string `json:"ID"`
+	Raiting int    `json:"Raiting"`
 }
 
 type Status string
@@ -43,7 +43,7 @@ type Status string
 const (
 	StatusWaiting    Status = "waiting"
 	StatusFound      Status = "found"
-	StatusInProgress Status = "inProgress"
+	StatusInProgress Status = "in_progress"
 	StatusFinished   Status = "finished"
 	StatusCanceled   Status = "canceled"
 )
