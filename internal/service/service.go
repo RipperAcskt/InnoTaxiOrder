@@ -10,6 +10,9 @@ import (
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 )
 
+//go:generate mockgen -destination=mocks/mock_service.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service Repo
+//go:generate mockgen -destination=mocks/mock_driver.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service DriverService
+
 var (
 	ErrNotFoud = fmt.Errorf("not found")
 )
