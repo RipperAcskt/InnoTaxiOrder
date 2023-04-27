@@ -130,7 +130,8 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 	for _, order := range orders {
 		driver := s.findDriver(order)
 		if driver == nil {
-			s.SyncDrivers(ctx, s.driversQueue[order.TaxiType].Drivers)
+			taxiType := model.NewClassType(order.TaxiType)
+			s.SyncDrivers(ctx, s.driversQueue[taxiType].Drivers)
 			break
 		}
 
@@ -200,7 +201,8 @@ func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType s
 		}
 		if order.ID == input.ID {
 			var id string
-			if userType == model.User {
+			userT := model.NewUserType(userType)
+			if userT == model.User {
 				id = order.DriverID
 			} else {
 				id = order.UserID
