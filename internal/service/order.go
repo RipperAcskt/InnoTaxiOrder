@@ -7,16 +7,16 @@ import (
 )
 
 type OrderService struct {
-	driversQueue map[string]*queue.Queue
+	driversQueue map[model.ClassType]*queue.Queue
 	Push         chan *proto.Driver
-	Pop          map[string]chan *proto.Driver
+	Pop          map[model.ClassType]chan *proto.Driver
 }
 
 func newOrderService() *OrderService {
 	os := OrderService{
-		driversQueue: map[string]*queue.Queue{},
+		driversQueue: map[model.ClassType]*queue.Queue{},
 		Push:         make(chan *proto.Driver),
-		Pop:          map[string]chan *proto.Driver{},
+		Pop:          map[model.ClassType]chan *proto.Driver{},
 	}
 
 	os.driversQueue[model.Econom] = queue.New()
@@ -32,7 +32,8 @@ func newOrderService() *OrderService {
 func (o *OrderService) Append() {
 	for {
 		driver := <-o.Push
-		o.driversQueue[driver.TaxiType].Append(driver)
+		taxiType := model.NewClassType(driver.TaxiType)
+		o.driversQueue[taxiType].Append(driver)
 	}
 }
 
@@ -58,5 +59,6 @@ func (o *OrderService) Get() {
 }
 
 func (o *OrderService) findDriver(order *model.Order) *proto.Driver {
-	return <-o.Pop[order.TaxiType]
+	taxiType := model.NewClassType(order.TaxiType)
+	return <-o.Pop[taxiType]
 }

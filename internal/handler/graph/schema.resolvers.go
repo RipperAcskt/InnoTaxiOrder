@@ -29,7 +29,9 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.OrderInf
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != model.User {
+
+	userT := model.NewUserType(userType)
+	if userT != model.User {
 		return nil, service.ErrValidation
 	}
 
@@ -94,7 +96,9 @@ func (r *mutationResolver) CompleteOrder(ctx context.Context, input string) (*mo
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != model.User {
+
+	userT := model.NewUserType(userType)
+	if userT != model.User {
 		return nil, service.ErrValidation
 	}
 	return r.s.CompleteOrder(ctx, id)
@@ -111,7 +115,9 @@ func (r *mutationResolver) CancelOrder(ctx context.Context, id string) (*model.O
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != model.User {
+
+	userT := model.NewUserType(userType)
+	if userT != model.User {
 		return nil, service.ErrValidation
 	}
 	return r.s.CancelOrder(ctx, userId)
@@ -139,7 +145,9 @@ func (r *queryResolver) CheckStatus(ctx context.Context, index string) (*model.O
 	if !ok {
 		return nil, fmt.Errorf("bad type")
 	}
-	if userType != model.User {
+
+	userT := model.NewUserType(userType)
+	if userT != model.User {
 		return nil, service.ErrValidation
 	}
 

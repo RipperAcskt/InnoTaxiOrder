@@ -68,7 +68,8 @@ func (c *Clients) SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*p
 }
 
 func (c *Clients) SetRaiting(ctx context.Context, raiting proto.Raiting, userType string) error {
-	if userType == model.User {
+	userT := model.NewUserType(userType)
+	if userT == model.User {
 		_, err := c.driverClient.SetRaiting(ctx, &raiting)
 		if err != nil {
 			return fmt.Errorf("set raiting driver failed: %w", err)
