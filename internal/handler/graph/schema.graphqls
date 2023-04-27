@@ -39,7 +39,7 @@ input OrderInfo {
 
 input Raiting {
   ID: String!
-  Raiting: Float!
+  Raiting: Int!
 }
 
 input OrderState {
@@ -51,4 +51,5 @@ type Mutation {
   CreateOrder(input: OrderInfo!): Order!
   SetRaiting(input: Raiting!): ID!
   CompleteOrder(input: ID!): Order!
+  CancelOrder(id: ID!): Order!
 }

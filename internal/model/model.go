@@ -1,5 +1,10 @@
 package model
 
+type (
+	UserType  string
+	ClassType string
+)
+
 type ElasticModel struct {
 	Hits struct {
 		Hits []struct {
@@ -10,7 +15,18 @@ type ElasticModel struct {
 }
 
 const (
-	Econom   string = "econom"
-	Comfort  string = "comfort"
-	Business string = "business"
+	Econom   ClassType = "econom"
+	Comfort  ClassType = "comfort"
+	Business ClassType = "business"
+
+	User   UserType = "user"
+	Driver UserType = "driver"
 )
+
+func NewUserType(s string) UserType {
+	return UserType(s)
+}
+
+func NewClassType(s string) ClassType {
+	return ClassType(s)
+}

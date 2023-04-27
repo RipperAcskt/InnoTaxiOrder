@@ -16,7 +16,12 @@ var (
 	ErrValidation   = fmt.Errorf("validation failed")
 )
 
-func Verify(token string, cfg *config.Config) (string, error) {
+type UserInfo struct {
+	Id   string
+	Type string
+}
+
+func Verify(token string, cfg *config.Config) (*UserInfo, error) {
 	tokenJwt, err := jwt.Parse(
 		token,
 		func(token *jwt.Token) (interface{}, error) {
@@ -25,34 +30,34 @@ func Verify(token string, cfg *config.Config) (string, error) {
 	)
 
 	if err != nil {
-		return "", fmt.Errorf("token parse failed: %w", err)
+		return nil, fmt.Errorf("token parse failed: %w", err)
 	}
 
 	claims, ok := tokenJwt.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", ErrTokenClaims
+		return nil, ErrTokenClaims
 	}
 
 	if !claims.VerifyExpiresAt(time.Now().UTC().Unix(), true) {
-		return "", ErrTokenExpired
+		return nil, ErrTokenExpired
 	}
 
 	userType, ok := claims["type"]
 	if !ok {
-		return "", ErrTokenType
+		return nil, ErrTokenType
 	}
-	str, ok := userType.(string)
+	typeStr, ok := userType.(string)
 	if !ok {
-		return "", ErrTokenType
-	}
-	if str != "user" {
-		return "", ErrValidation
+		return nil, ErrTokenType
 	}
 
 	id, ok := claims["user_id"]
 	if !ok {
-		return "", ErrTokenId
+		return nil, ErrTokenId
 	}
 
-	return fmt.Sprint(id), nil
+	return &UserInfo{
+		fmt.Sprint(id),
+		typeStr,
+	}, nil
 }

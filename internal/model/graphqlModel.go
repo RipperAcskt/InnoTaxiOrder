@@ -34,8 +34,8 @@ type OrderState struct {
 }
 
 type Raiting struct {
-	ID      string  `json:"ID"`
-	Raiting float64 `json:"Raiting"`
+	ID      string `json:"ID"`
+	Raiting int    `json:"Raiting"`
 }
 
 type Status string

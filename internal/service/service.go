@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/RipperAcskt/innotaxi/pkg/proto"
 	"github.com/RipperAcskt/innotaxiorder/config"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
-	orderProto "github.com/RipperAcskt/innotaxiorder/pkg/proto"
 )
 
 var (
@@ -31,7 +31,8 @@ type Repo interface {
 }
 
 type DriverService interface {
-	SyncDriver(ctx context.Context, drivers []*orderProto.Driver) ([]*orderProto.Driver, error)
+	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
+	SetRaiting(ctx context.Context, raiting proto.Raiting, userType string) error
 }
 
 func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
@@ -85,7 +86,7 @@ func (s *Service) TimeSync() {
 
 }
 
-func (s *Service) SyncDrivers(ctx context.Context, drivers []*orderProto.Driver) error {
+func (s *Service) SyncDrivers(ctx context.Context, drivers []*proto.Driver) error {
 	drivers, err := s.SyncDriver(ctx, drivers)
 	if err != nil {
 		return fmt.Errorf("can't sync drivers: %w", err)
@@ -129,7 +130,8 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 	for _, order := range orders {
 		driver := s.findDriver(order)
 		if driver == nil {
-			s.SyncDrivers(ctx, s.driversQueue[order.TaxiType].Drivers)
+			taxiType := model.NewClassType(order.TaxiType)
+			s.SyncDrivers(ctx, s.driversQueue[taxiType].Drivers)
 			break
 		}
 
@@ -175,7 +177,7 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 		return nil, fmt.Errorf("update order failed: %w", err)
 	}
 
-	driver := &orderProto.Driver{
+	driver := &proto.Driver{
 		ID:          order.DriverID,
 		Name:        order.DriverName,
 		PhoneNumber: order.DriverPhone,
@@ -185,4 +187,50 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 
 	s.Push <- driver
 	return order, nil
+}
+
+func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType string) (string, error) {
+	orders, err := s.GetOrders(ctx, nil)
+	if err != nil {
+		return "", fmt.Errorf("get orders failed: %w", err)
+	}
+
+	for i, order := range orders {
+		if i >= 5 {
+			break
+		}
+		if order.ID == input.ID {
+			var id string
+			userT := model.NewUserType(userType)
+			if userT == model.User {
+				id = order.DriverID
+			} else {
+				id = order.UserID
+			}
+			rating := proto.Raiting{
+				ID:   id,
+				Mark: int64(input.Raiting),
+			}
+			return "", s.SetRaiting(ctx, rating, userType)
+		}
+	}
+	return "", fmt.Errorf("order not found")
+}
+
+func (s *Service) CancelOrder(ctx context.Context, userID string) (*model.Order, error) {
+	orders, err := s.GetOrders(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("get orders by id failed: %w", err)
+	}
+	for _, order := range orders {
+		if order.UserID == userID && order.Status != model.StatusFinished && order.Status != model.StatusCanceled {
+			order.Status = model.StatusCanceled
+			err = s.UpdateOrder(ctx, order)
+			if err != nil {
+				return nil, fmt.Errorf("update order failed: %w", err)
+			}
+			return order, nil
+		}
+	}
+	return nil, fmt.Errorf("you haven't any orders")
 }
