@@ -67,17 +67,17 @@ func (c *Clients) SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*p
 	return syncDrivers, nil
 }
 
-func (c *Clients) SetRaiting(ctx context.Context, raiting proto.Raiting, userType string) error {
+func (c *Clients) SetRaiting(ctx context.Context, raiting *proto.Raiting, userType string) error {
 	userT := model.NewUserType(userType)
 	if userT == model.User {
-		_, err := c.driverClient.SetRaiting(ctx, &raiting)
+		_, err := c.driverClient.SetRaiting(ctx, raiting)
 		if err != nil {
 			return fmt.Errorf("set raiting driver failed: %w", err)
 		}
 		return nil
 	}
 
-	_, err := c.userClient.SetRaiting(ctx, &raiting)
+	_, err := c.userClient.SetRaiting(ctx, raiting)
 	if err != nil {
 		return fmt.Errorf("set raiting user failed: %w", err)
 	}
