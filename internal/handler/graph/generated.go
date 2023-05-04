@@ -67,8 +67,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		CheckStatus func(childComplexity int, index string) int
-		GetOrders   func(childComplexity int, indexes []string) int
+		CheckStatus   func(childComplexity int, index string) int
+		GetOrders     func(childComplexity int, indexes []string) int
+		GetOrdersList func(childComplexity int, info model.OrderFilters, offset *int, limit *int) int
 	}
 }
 
@@ -80,6 +81,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetOrders(ctx context.Context, indexes []string) ([]*model.Order, error)
+	GetOrdersList(ctx context.Context, info model.OrderFilters, offset *int, limit *int) ([]*model.Order, error)
 	CheckStatus(ctx context.Context, index string) (*model.Order, error)
 }
 
@@ -247,6 +249,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetOrders(childComplexity, args["indexes"].([]string)), true
 
+	case "Query.GetOrdersList":
+		if e.complexity.Query.GetOrdersList == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetOrdersList_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetOrdersList(childComplexity, args["info"].(model.OrderFilters), args["offset"].(*int), args["limit"].(*int)), true
+
 	}
 	return 0, false
 }
@@ -255,6 +269,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputOrderFilters,
 		ec.unmarshalInputOrderInfo,
 		ec.unmarshalInputOrderState,
 		ec.unmarshalInputRaiting,
@@ -409,6 +424,39 @@ func (ec *executionContext) field_Query_CheckStatus_args(ctx context.Context, ra
 		}
 	}
 	args["index"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetOrdersList_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.OrderFilters
+	if tmp, ok := rawArgs["info"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("info"))
+		arg0, err = ec.unmarshalNOrderFilters2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderFilters(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["info"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg2
 	return args, nil
 }
 
@@ -1329,6 +1377,85 @@ func (ec *executionContext) fieldContext_Query_GetOrders(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_GetOrders_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetOrdersList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetOrdersList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetOrdersList(rctx, fc.Args["info"].(model.OrderFilters), fc.Args["offset"].(*int), fc.Args["limit"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Order)
+	fc.Result = res
+	return ec.marshalNOrder2ᚕᚖgithubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetOrdersList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Order_ID(ctx, field)
+			case "UserID":
+				return ec.fieldContext_Order_UserID(ctx, field)
+			case "DriverID":
+				return ec.fieldContext_Order_DriverID(ctx, field)
+			case "DriverName":
+				return ec.fieldContext_Order_DriverName(ctx, field)
+			case "DriverPhone":
+				return ec.fieldContext_Order_DriverPhone(ctx, field)
+			case "DriverRaiting":
+				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "TaxiType":
+				return ec.fieldContext_Order_TaxiType(ctx, field)
+			case "From":
+				return ec.fieldContext_Order_From(ctx, field)
+			case "To":
+				return ec.fieldContext_Order_To(ctx, field)
+			case "Date":
+				return ec.fieldContext_Order_Date(ctx, field)
+			case "Status":
+				return ec.fieldContext_Order_Status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Order", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetOrdersList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3316,6 +3443,74 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputOrderFilters(ctx context.Context, obj interface{}) (model.OrderFilters, error) {
+	var it model.OrderFilters
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"DriverID", "UserID", "From", "To", "FromDate", "ToDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "DriverID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DriverID"))
+			it.DriverID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "UserID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("UserID"))
+			it.UserID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "From":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("From"))
+			it.From, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "To":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("To"))
+			it.To, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "FromDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromDate"))
+			it.FromDate, err = ec.unmarshalNDate2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ToDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ToDate"))
+			it.ToDate, err = ec.unmarshalNDate2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputOrderInfo(ctx context.Context, obj interface{}) (model.OrderInfo, error) {
 	var it model.OrderInfo
 	asMap := map[string]interface{}{}
@@ -3633,6 +3828,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_GetOrders(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "GetOrdersList":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetOrdersList(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4175,6 +4393,11 @@ func (ec *executionContext) marshalNOrder2ᚖgithubᚗcomᚋRipperAcsktᚋinnota
 	return ec._Order(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNOrderFilters2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderFilters(ctx context.Context, v interface{}) (model.OrderFilters, error) {
+	res, err := ec.unmarshalInputOrderFilters(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNOrderInfo2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐOrderInfo(ctx context.Context, v interface{}) (model.OrderInfo, error) {
 	res, err := ec.unmarshalInputOrderInfo(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4486,6 +4709,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
 	return res
 }
 
