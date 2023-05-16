@@ -44,6 +44,10 @@ github.com/RipperAcskt/innotaxi v0.0.0-20230420094616-84e8bed9591e h1:xFZDfXQ/cs
 github.com/RipperAcskt/innotaxi v0.0.0-20230420094616-84e8bed9591e/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
 github.com/RipperAcskt/innotaxi v0.0.0-20230427112510-dd792ddd2c47 h1:A4w0PlyuR0eAZ7v62zgZkPyMl4CZ8x1p/t0tXHl8dTo=
 github.com/RipperAcskt/innotaxi v0.0.0-20230427112510-dd792ddd2c47/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
+github.com/RipperAcskt/innotaxi v0.0.0-20230510120836-4fa90b195416 h1:kE8M36ZZgAn2S6q25udH5z9BDTjhaTu2nj1f+M9GTkw=
+github.com/RipperAcskt/innotaxi v0.0.0-20230510120836-4fa90b195416/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
+github.com/RipperAcskt/innotaxi v0.0.0-20230510121447-c277544c20f8 h1:X97Z6fOqbMsluX1mqpsANHzHeFvTFpwKCdyRBS3IiT8=
+github.com/RipperAcskt/innotaxi v0.0.0-20230510121447-c277544c20f8/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
 github.com/agnivade/levenshtein v1.0.1/go.mod h1:CURSv5d9Uaml+FovSIICkLbAUZ9S4RqaHDIsdSBg7lM=
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=

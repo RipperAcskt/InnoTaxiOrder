@@ -8,6 +8,7 @@ import (
 	"github.com/RipperAcskt/innotaxiorder/config"
 	"github.com/RipperAcskt/innotaxiorder/internal/client"
 	"github.com/RipperAcskt/innotaxiorder/internal/handler/graph"
+	"github.com/RipperAcskt/innotaxiorder/internal/handler/grpc"
 	"github.com/RipperAcskt/innotaxiorder/internal/repo/elastic"
 	"github.com/RipperAcskt/innotaxiorder/internal/server"
 	"github.com/RipperAcskt/innotaxiorder/internal/service"
@@ -57,9 +58,20 @@ func Run() error {
 		Log: log,
 	}
 
-	if err := server.Run(handler.InitRouters(), cfg); err != nil && err != http.ErrServerClosed {
-		log.Error(fmt.Sprintf("server run failed: %v", err))
-	}
+	go func() {
+		if err := server.Run(handler.InitRouters(), cfg); err != nil && err != http.ErrServerClosed {
+			log.Error(fmt.Sprintf("server run failed: %v", err))
+			return
+		}
+	}()
+
+	grpcServer := grpc.New(log, service, cfg)
+	go func() {
+		if err := grpcServer.Run(); err != nil {
+			log.Error(fmt.Sprintf("grpc server run failed: %v", err))
+			return
+		}
+	}()
 
 	if err := server.ShutDown(); err != nil {
 		return fmt.Errorf("server shut down failed: %w", err)
