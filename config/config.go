@@ -20,6 +20,8 @@ type Config struct {
 	HS256_SECRET string `mapstructure:"HS256_SECRET"`
 
 	SYNC_TIME int `mapstructure:"SYNC_TIME"`
+
+	GRPC_HOST string `mapstructure:"GRPC_HOST"`
 }
 
 func New() (*Config, error) {

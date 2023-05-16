@@ -14,6 +14,12 @@ type ElasticModel struct {
 	} `json:"hits"`
 }
 
+type PagginationInfo struct {
+	Offset          int
+	Limit           int
+	PagginationFlag bool
+}
+
 const (
 	Econom   ClassType = "econom"
 	Comfort  ClassType = "comfort"
