@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.27
-	github.com/RipperAcskt/innotaxi v0.0.0-20230510121447-c277544c20f8
+	github.com/RipperAcskt/innotaxi v0.0.0-20230427112510-dd792ddd2c47
 	github.com/elastic/go-elasticsearch/v8 v8.7.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
