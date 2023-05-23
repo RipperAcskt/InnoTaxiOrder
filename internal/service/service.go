@@ -31,7 +31,7 @@ type Repo interface {
 	GetStatus(ctx context.Context, taxiType, status string) ([]*model.Order, error)
 	UpdateOrder(ctx context.Context, order *model.Order) error
 	GetOrdersByUserID(ctx context.Context, index string, status string) ([]*model.Order, error)
-	GetOrderByFilter(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error)
+	GetOrderByFilter(ctx context.Context, filters model.OrderFilters, pagginationInfo model.PagginationInfo) ([]*model.Order, error)
 }
 
 type DriverService interface {
@@ -168,8 +168,8 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 	return nil, ErrNotFoud
 }
 
-func (s *Service) GetOrdersList(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error) {
-	return s.GetOrderByFilter(ctx, filters, offset, limit)
+func (s *Service) GetOrdersList(ctx context.Context, filters model.OrderFilters, pagginationInfo model.PagginationInfo) ([]*model.Order, error) {
+	return s.GetOrderByFilter(ctx, filters, pagginationInfo)
 }
 
 func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Order, error) {

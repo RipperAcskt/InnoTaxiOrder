@@ -290,7 +290,7 @@ func (es *Elastic) GetOrdersByUserID(ctx context.Context, index string, status s
 	return es.parseInfo(res)
 }
 
-func (es *Elastic) GetOrderByFilter(ctx context.Context, filters model.OrderFilters, offset, limit int) ([]*model.Order, error) {
+func (es *Elastic) GetOrderByFilter(ctx context.Context, filters model.OrderFilters, pagginationInfo model.PagginationInfo) ([]*model.Order, error) {
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -316,13 +316,24 @@ func (es *Elastic) GetOrderByFilter(ctx context.Context, filters model.OrderFilt
 		return nil, fmt.Errorf("encode failed: %w", err)
 	}
 
-	res, err := es.Client.Search(
-		es.Client.Search.WithContext(queryCtx),
-		es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
-		es.Client.Search.WithBody(&body),
-		es.Client.Search.WithFrom(offset),
-		es.Client.Search.WithSize(limit),
-	)
+	var res *esapi.Response
+	var err error
+	if pagginationInfo.PagginationFlag {
+		res, err = es.Client.Search(
+			es.Client.Search.WithContext(queryCtx),
+			es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
+			es.Client.Search.WithBody(&body),
+			es.Client.Search.WithFrom(pagginationInfo.Offset),
+			es.Client.Search.WithSize(pagginationInfo.Limit),
+		)
+	} else {
+		res, err = es.Client.Search(
+			es.Client.Search.WithContext(queryCtx),
+			es.Client.Search.WithIndex(es.cfg.ELASTIC_DB_NAME),
+			es.Client.Search.WithBody(&body),
+		)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("search failed: %w", err)
 	}

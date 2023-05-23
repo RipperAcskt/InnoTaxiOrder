@@ -50,18 +50,18 @@ func (mr *MockRepoMockRecorder) CreateOrder(arg0, arg1 interface{}) *gomock.Call
 }
 
 // GetOrderByFilter mocks base method.
-func (m *MockRepo) GetOrderByFilter(arg0 context.Context, arg1 model.OrderFilters, arg2, arg3 int) ([]*model.Order, error) {
+func (m *MockRepo) GetOrderByFilter(arg0 context.Context, arg1 model.OrderFilters, arg2 model.PagginationInfo) ([]*model.Order, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrderByFilter", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "GetOrderByFilter", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]*model.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetOrderByFilter indicates an expected call of GetOrderByFilter.
-func (mr *MockRepoMockRecorder) GetOrderByFilter(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) GetOrderByFilter(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrderByFilter", reflect.TypeOf((*MockRepo)(nil).GetOrderByFilter), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrderByFilter", reflect.TypeOf((*MockRepo)(nil).GetOrderByFilter), arg0, arg1, arg2)
 }
 
 // GetOrders mocks base method.

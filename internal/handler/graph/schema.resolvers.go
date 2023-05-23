@@ -130,8 +130,13 @@ func (r *queryResolver) GetOrders(ctx context.Context, indexes []string) ([]*mod
 }
 
 // GetOrdersList is the resolver for the GetOrdersList field.
-func (r *queryResolver) GetOrdersList(ctx context.Context, info model.OrderFilters, offset *int, limit *int) ([]*model.Order, error) {
-	return r.s.GetOrdersList(ctx, info, *offset, *limit)
+func (r *queryResolver) GetOrdersList(ctx context.Context, info model.OrderFilters, offset, limit *int) ([]*model.Order, error) {
+	pagginationInfo := model.PagginationInfo{
+		Offset:          *offset,
+		Limit:           *limit,
+		PagginationFlag: true,
+	}
+	return r.s.GetOrdersList(ctx, info, pagginationInfo)
 }
 
 // CheckStatus is the resolver for the CheckStatus field.
