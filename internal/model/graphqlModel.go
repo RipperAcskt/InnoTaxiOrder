@@ -9,17 +9,17 @@ import (
 )
 
 type Order struct {
-	ID            string  `json:"ID"`
-	UserID        string  `json:"UserID"`
-	DriverID      string  `json:"DriverID"`
-	DriverName    string  `json:"DriverName"`
-	DriverPhone   string  `json:"DriverPhone"`
-	DriverRaiting float64 `json:"DriverRaiting"`
-	TaxiType      string  `json:"TaxiType"`
-	From          string  `json:"From"`
-	To            string  `json:"To"`
-	Date          string  `json:"Date"`
-	Status        Status  `json:"Status"`
+	ID           string  `json:"ID"`
+	UserID       string  `json:"UserID"`
+	DriverID     string  `json:"DriverID"`
+	DriverName   string  `json:"DriverName"`
+	DriverPhone  string  `json:"DriverPhone"`
+	DriverRating float64 `json:"DriverRating"`
+	TaxiType     string  `json:"TaxiType"`
+	From         string  `json:"From"`
+	To           string  `json:"To"`
+	Date         string  `json:"Date"`
+	Status       Status  `json:"Status"`
 }
 
 type OrderFilters struct {
@@ -42,9 +42,9 @@ type OrderState struct {
 	State Status `json:"State"`
 }
 
-type Raiting struct {
-	ID      string `json:"ID"`
-	Raiting int    `json:"Raiting"`
+type Rating struct {
+	ID     string `json:"ID"`
+	Rating int    `json:"Rating"`
 }
 
 type Status string

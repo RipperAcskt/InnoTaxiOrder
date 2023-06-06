@@ -22,6 +22,11 @@ type Config struct {
 	SYNC_TIME int `mapstructure:"SYNC_TIME"`
 
 	GRPC_HOST string `mapstructure:"GRPC_HOST"`
+
+	ADMIN_LOGIN string `mapstructure:"ADMIN_LOGIN"`
+	ADMIN_PASS  string `mapstructure:"ADMIN_PASS"`
+
+	BROKER_HOST string `mapstructure:"BROKER_HOST"`
 }
 
 func New() (*Config, error) {

@@ -21,8 +21,9 @@ type Service struct {
 	DriverService
 	Repo
 	*OrderService
-	Err chan error
-	cfg *config.Config
+	broker Broker
+	Err    chan error
+	cfg    *config.Config
 }
 
 type Repo interface {
@@ -36,17 +37,22 @@ type Repo interface {
 
 type DriverService interface {
 	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
-	SetRaiting(ctx context.Context, raiting *proto.Raiting, userType string) error
+	SetRaiting(ctx context.Context, raiting *proto.Rating, userType string) error
 }
 
-func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
+type Broker interface {
+	Write(user model.Order) error
+}
+
+func New(repo Repo, driver DriverService, broker Broker, cfg *config.Config) *Service {
 	orderService := newOrderService()
 	service := &Service{
-		driver,
-		repo,
-		orderService,
-		make(chan error),
-		cfg,
+		DriverService: driver,
+		Repo:          repo,
+		OrderService:  orderService,
+		broker:        broker,
+		Err:           make(chan error),
+		cfg:           cfg,
 	}
 
 	go service.Append()
@@ -145,7 +151,7 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 		order.DriverID = driver.ID
 		order.DriverName = driver.Name
 		order.DriverPhone = driver.PhoneNumber
-		order.DriverRaiting = float64(driver.Raiting)
+		order.DriverRating = float64(driver.Rating)
 		order.Status = model.StatusFound
 		err = s.UpdateOrder(ctx, order)
 		if err != nil {
@@ -192,15 +198,20 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 		ID:          order.DriverID,
 		Name:        order.DriverName,
 		PhoneNumber: order.DriverPhone,
-		Raiting:     float32(order.DriverRaiting),
+		Rating:      float32(order.DriverRating),
 		TaxiType:    order.TaxiType,
 	}
 
 	s.Push <- driver
+
+	err = s.broker.Write(*order)
+	if err != nil {
+		return nil, fmt.Errorf("broker write failed: %w", err)
+	}
 	return order, nil
 }
 
-func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType string) (string, error) {
+func (s *Service) SetRating(ctx context.Context, input model.Rating, userType string) (string, error) {
 	orders, err := s.GetOrders(ctx, nil)
 	if err != nil {
 		return "", fmt.Errorf("get orders failed: %w", err)
@@ -218,9 +229,9 @@ func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType s
 			} else {
 				id = order.UserID
 			}
-			rating := proto.Raiting{
+			rating := proto.Rating{
 				ID:   id,
-				Mark: int64(input.Raiting),
+				Mark: float32(input.Rating),
 			}
 			return "", s.SetRaiting(ctx, &rating, userType)
 		}

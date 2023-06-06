@@ -77,7 +77,7 @@ func FromContext(ctx context.Context, k key) (string, bool) {
 }
 
 // SetRaiting is the resolver for the SetRaiting field.
-func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) (string, error) {
+func (r *mutationResolver) SetRating(ctx context.Context, input model.Rating) (string, error) {
 	userType, ok := FromContext(ctx, userType)
 	if !ok {
 		return "", fmt.Errorf("bad type")

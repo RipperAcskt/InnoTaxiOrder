@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
+	"github.com/RipperAcskt/innotaxiorder/internal/broker"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"github.com/RipperAcskt/innotaxiorder/internal/service"
 	"github.com/RipperAcskt/innotaxiorder/internal/service/mocks"
@@ -36,7 +37,7 @@ func TestCreateOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -74,7 +75,7 @@ func TestGetOrders(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -112,7 +113,7 @@ func TestCancelOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -150,7 +151,7 @@ func TestSetRating(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -159,7 +160,7 @@ func TestSetRating(t *testing.T) {
 				DriverService: DriverService,
 			}
 
-			_, err := service.SetRating(context.Background(), model.Raiting{}, "")
+			_, err := service.SetRating(context.Background(), model.Rating{}, "")
 			assert.NotEqual(t, err, tt.err)
 		})
 	}
@@ -188,7 +189,7 @@ func TestFind(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
