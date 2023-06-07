@@ -42,6 +42,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/RipperAcskt/innotaxi v0.0.0-20230607082003-f91e85fe39fc h1:VO85HKgjOu1DU9B7HNvW2RqKg/E/Xnc9Ijz+gCMKnfo=
 github.com/RipperAcskt/innotaxi v0.0.0-20230607082003-f91e85fe39fc/go.mod h1:FRCOzBFfYpHcoe6Eb++Q1rR9lOwEzLlxu/PbZufMGL0=
+github.com/RipperAcskt/innotaxi v0.0.0-20230607135234-63ea6ab028e6 h1:LcnqL0zFSvc8ZaBgiUat1GsO2T4YE0cRRgQWEuVJMhI=
+github.com/RipperAcskt/innotaxi v0.0.0-20230607135234-63ea6ab028e6/go.mod h1:ZKHQ6SqiNziLW9o4zRhfKTblK1rRx+0UGJyP6RWtobc=
 github.com/agnivade/levenshtein v1.0.1/go.mod h1:CURSv5d9Uaml+FovSIICkLbAUZ9S4RqaHDIsdSBg7lM=
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
