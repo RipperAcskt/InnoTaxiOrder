@@ -40,10 +40,8 @@ github.com/99designs/gqlgen v0.17.27 h1:XPsaZiWY1lL2qqVYtBt37GzkyX7bBiVvda7k1buC
 github.com/99designs/gqlgen v0.17.27/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/RipperAcskt/innotaxi v0.0.0-20230427112510-dd792ddd2c47 h1:A4w0PlyuR0eAZ7v62zgZkPyMl4CZ8x1p/t0tXHl8dTo=
-github.com/RipperAcskt/innotaxi v0.0.0-20230427112510-dd792ddd2c47/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
-github.com/RipperAcskt/innotaxi v0.0.0-20230522101759-3cf8838cae00 h1:Fh4//xqdtq9xXkleTQqv5CfwA4nJ7fIvmnVm6qOr/LY=
-github.com/RipperAcskt/innotaxi v0.0.0-20230522101759-3cf8838cae00/go.mod h1:/VjaUeqCNibOQVKz8ryrQYxtOPRinjfc65z2pA7hZXI=
+github.com/RipperAcskt/innotaxi v0.0.0-20230607082003-f91e85fe39fc h1:VO85HKgjOu1DU9B7HNvW2RqKg/E/Xnc9Ijz+gCMKnfo=
+github.com/RipperAcskt/innotaxi v0.0.0-20230607082003-f91e85fe39fc/go.mod h1:FRCOzBFfYpHcoe6Eb++Q1rR9lOwEzLlxu/PbZufMGL0=
 github.com/agnivade/levenshtein v1.0.1/go.mod h1:CURSv5d9Uaml+FovSIICkLbAUZ9S4RqaHDIsdSBg7lM=
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=

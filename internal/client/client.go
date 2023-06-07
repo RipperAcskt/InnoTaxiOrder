@@ -6,17 +6,18 @@ import (
 
 	"github.com/RipperAcskt/innotaxi/pkg/proto"
 	"github.com/RipperAcskt/innotaxiorder/config"
-	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Clients struct {
-	userClient   proto.UserServiceClient
+	analystClient proto.AnalystServiceClient
+	analystConn   *grpc.ClientConn
+
 	driverClient proto.DriverServiceClient
-	userConn     *grpc.ClientConn
 	driverConn   *grpc.ClientConn
-	cfg          *config.Config
+
+	cfg *config.Config
 }
 
 type OrderRequest struct {
@@ -29,11 +30,11 @@ func New(cfg *config.Config) (*Clients, error) {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	userConn, err := grpc.Dial(cfg.GRPC_USER_SERVICE_HOST, opts...)
+	analystConn, err := grpc.Dial(cfg.GRPC_ANALYST_SERVICE_HOST, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("dial failed: %w", err)
 	}
-	userClient := proto.NewUserServiceClient(userConn)
+	analystClient := proto.NewAnalystServiceClient(analystConn)
 
 	driverConn, err := grpc.Dial(cfg.GRPC_DIVER_SERVICE_HOST, opts...)
 	if err != nil {
@@ -42,11 +43,13 @@ func New(cfg *config.Config) (*Clients, error) {
 	driverClient := proto.NewDriverServiceClient(driverConn)
 
 	return &Clients{
-		userClient:   userClient,
-		driverClient: driverClient,
-		userConn:     userConn,
-		driverConn:   driverConn,
-		cfg:          cfg,
+		analystClient: analystClient,
+		driverClient:  driverClient,
+
+		analystConn: analystConn,
+		driverConn:  driverConn,
+
+		cfg: cfg,
 	}, nil
 }
 
@@ -67,28 +70,20 @@ func (c *Clients) SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*p
 	return syncDrivers, nil
 }
 
-func (c *Clients) SetRaiting(ctx context.Context, raiting *proto.Raiting, userType string) error {
-	userT := model.NewUserType(userType)
-	if userT == model.User {
-		_, err := c.driverClient.SetRaiting(ctx, raiting)
-		if err != nil {
-			return fmt.Errorf("set raiting driver failed: %w", err)
-		}
-		return nil
-	}
-
-	_, err := c.userClient.SetRaiting(ctx, raiting)
+func (c *Clients) SetRating(ctx context.Context, raiting *proto.Rating) error {
+	_, err := c.analystClient.SetRating(ctx, raiting)
 	if err != nil {
-		return fmt.Errorf("set raiting user failed: %w", err)
+		return fmt.Errorf("set rating failed: %w", err)
 	}
 	return nil
 }
 
 func (c *Clients) Close() error {
-	err := c.userConn.Close()
+	err := c.analystConn.Close()
 	if err != nil {
 		return fmt.Errorf("user conn close failed: %w", err)
 	}
+
 	err = c.driverConn.Close()
 	if err != nil {
 		return fmt.Errorf("driver conn close failed: %w", err)

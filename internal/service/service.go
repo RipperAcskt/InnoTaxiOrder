@@ -36,7 +36,7 @@ type Repo interface {
 
 type DriverService interface {
 	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
-	SetRaiting(ctx context.Context, raiting *proto.Raiting, userType string) error
+	SetRating(ctx context.Context, raiting *proto.Rating) error
 }
 
 func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
@@ -145,7 +145,7 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 		order.DriverID = driver.ID
 		order.DriverName = driver.Name
 		order.DriverPhone = driver.PhoneNumber
-		order.DriverRaiting = float64(driver.Raiting)
+		order.DriverRating = float64(driver.Rating)
 		order.Status = model.StatusFound
 		err = s.UpdateOrder(ctx, order)
 		if err != nil {
@@ -192,7 +192,7 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 		ID:          order.DriverID,
 		Name:        order.DriverName,
 		PhoneNumber: order.DriverPhone,
-		Raiting:     float32(order.DriverRaiting),
+		Rating:      float32(order.DriverRating),
 		TaxiType:    order.TaxiType,
 	}
 
@@ -200,10 +200,27 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 	return order, nil
 }
 
-func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType string) (string, error) {
-	orders, err := s.GetOrders(ctx, nil)
-	if err != nil {
-		return "", fmt.Errorf("get orders failed: %w", err)
+func (s *Service) SetRatingService(ctx context.Context, input model.Rating, userType string, userID string) (string, error) {
+	var orders []*model.Order
+	var err error
+
+	userT := model.NewUserType(userType)
+	if userT == model.User {
+		orders, err = s.GetOrdersByUserID(ctx, userID, model.StatusFinished.String())
+		if err != nil {
+			return "", fmt.Errorf("get orders failed: %w", err)
+		}
+	} else if userT == model.Driver {
+		filters := model.OrderFilters{
+			DriverID: userID,
+		}
+		paggination := model.PagginationInfo{
+			PagginationFlag: false,
+		}
+		orders, err = s.GetOrderByFilter(ctx, filters, paggination)
+		if err != nil {
+			return "", fmt.Errorf("get orders failed: %w", err)
+		}
 	}
 
 	for i, order := range orders {
@@ -218,11 +235,12 @@ func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType s
 			} else {
 				id = order.UserID
 			}
-			rating := proto.Raiting{
+			rating := proto.Rating{
+				Type: userType,
 				ID:   id,
-				Mark: int64(input.Raiting),
+				Mark: float32(input.Rating),
 			}
-			return "", s.SetRaiting(ctx, &rating, userType)
+			return "", s.SetRating(ctx, &rating)
 		}
 	}
 	return "", fmt.Errorf("order not found")

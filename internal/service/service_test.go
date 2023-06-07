@@ -159,7 +159,7 @@ func TestSetRating(t *testing.T) {
 				DriverService: DriverService,
 			}
 
-			_, err := service.SetRating(context.Background(), model.Raiting{}, "")
+			_, err := service.SetRatingService(context.Background(), model.Rating{}, "0", "")
 			assert.NotEqual(t, err, tt.err)
 		})
 	}

@@ -77,12 +77,18 @@ func FromContext(ctx context.Context, k key) (string, bool) {
 }
 
 // SetRaiting is the resolver for the SetRaiting field.
-func (r *mutationResolver) SetRaiting(ctx context.Context, input model.Raiting) (string, error) {
+func (r *mutationResolver) SetRating(ctx context.Context, input model.Rating) (string, error) {
 	userType, ok := FromContext(ctx, userType)
 	if !ok {
 		return "", fmt.Errorf("bad type")
 	}
-	return r.s.SetRating(ctx, input, userType)
+
+	id, ok := FromContext(ctx, userId)
+	if !ok {
+		return "", fmt.Errorf("bad access token")
+	}
+
+	return r.s.SetRatingService(ctx, input, userType, id)
 }
 
 // CompleteOrder is the resolver for the CompleteOrder field.
