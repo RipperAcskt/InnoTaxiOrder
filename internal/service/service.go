@@ -21,8 +21,9 @@ type Service struct {
 	DriverService
 	Repo
 	*OrderService
-	Err chan error
-	cfg *config.Config
+	broker Broker
+	Err    chan error
+	cfg    *config.Config
 }
 
 type Repo interface {
@@ -39,14 +40,19 @@ type DriverService interface {
 	SetRating(ctx context.Context, raiting *proto.Rating) error
 }
 
-func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
+type Broker interface {
+	Write(user model.Order) error
+}
+
+func New(repo Repo, driver DriverService, broker Broker, cfg *config.Config) *Service {
 	orderService := newOrderService()
 	service := &Service{
-		driver,
-		repo,
-		orderService,
-		make(chan error),
-		cfg,
+		DriverService: driver,
+		Repo:          repo,
+		OrderService:  orderService,
+		broker:        broker,
+		Err:           make(chan error),
+		cfg:           cfg,
 	}
 
 	go service.Append()
@@ -197,6 +203,11 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 	}
 
 	s.Push <- driver
+
+	err = s.broker.Write(*order)
+	if err != nil {
+		return nil, fmt.Errorf("broker write failed: %w", err)
+	}
 	return order, nil
 }
 
