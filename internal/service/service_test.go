@@ -138,7 +138,7 @@ func TestSetRating(t *testing.T) {
 		{
 			name: "set raiting",
 			mockBehavior: func(s *mocks.MockRepo, s1 *mocks.MockDriverService) {
-				s.EXPECT().GetOrders(context.Background(), nil).Return(nil, nil)
+				s.EXPECT().GetOrdersByUserID(context.Background(), "", model.StatusFinished.String()).Return(nil, nil)
 			},
 			err: nil,
 		},
@@ -160,7 +160,7 @@ func TestSetRating(t *testing.T) {
 				DriverService: DriverService,
 			}
 
-			_, err := service.SetRatingService(context.Background(), model.Rating{}, "0", "")
+			_, err := service.SetRatingService(context.Background(), model.Rating{}, "user", "")
 			assert.NotEqual(t, err, tt.err)
 		})
 	}
