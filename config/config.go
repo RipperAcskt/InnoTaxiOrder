@@ -26,7 +26,7 @@ type Config struct {
 	ADMIN_LOGIN string `mapstructure:"ADMIN_LOGIN"`
 	ADMIN_PASS  string `mapstructure:"ADMIN_PASS"`
 
-	BROKER_HOST string `mapstructure:"BROKER_HOST"`
+	KAFKA_HOST string `mapstructure:"KAFKA_HOST"`
 }
 
 func New() (*Config, error) {

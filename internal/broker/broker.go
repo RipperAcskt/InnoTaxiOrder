@@ -16,7 +16,7 @@ type Broker struct {
 }
 
 func New(cfg *config.Config) (*Broker, error) {
-	conn, err := kafka.DialLeader(context.Background(), "tcp", cfg.BROKER_HOST, "order", 0)
+	conn, err := kafka.DialLeader(context.Background(), "tcp", cfg.KAFKA_HOST, "order", 0)
 	if err != nil {
 		return nil, fmt.Errorf("dial leader failed: %w", err)
 	}
@@ -27,7 +27,7 @@ func New(cfg *config.Config) (*Broker, error) {
 	}, nil
 }
 
-func (b *Broker) Write(order model.Order) error {
+func (b *Broker) SendCompleteOrderEvent(order model.Order) error {
 	data, err := json.Marshal(order)
 	if err != nil {
 		return fmt.Errorf("marshal failed: %w", err)

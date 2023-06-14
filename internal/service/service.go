@@ -12,6 +12,8 @@ import (
 
 //go:generate mockgen -destination=mocks/mock_service.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service Repo
 //go:generate mockgen -destination=mocks/mock_driver.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service DriverService
+//go:generate mockgen -destination=mocks/mock_event.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service EventService
+//go:generate mockgen -destination=mocks/mock_analyst.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service AnalystService
 
 var (
 	ErrNotFoud = fmt.Errorf("not found")
@@ -21,9 +23,10 @@ type Service struct {
 	DriverService
 	Repo
 	*OrderService
-	broker Broker
-	Err    chan error
-	cfg    *config.Config
+	analystService AnalystService
+	eventService   EventService
+	Err            chan error
+	cfg            *config.Config
 }
 
 type Repo interface {
@@ -37,22 +40,26 @@ type Repo interface {
 
 type DriverService interface {
 	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
+}
+
+type EventService interface {
+	SendCompleteOrderEvent(user model.Order) error
+}
+
+type AnalystService interface {
 	SetRating(ctx context.Context, raiting *proto.Rating) error
 }
 
-type Broker interface {
-	Write(user model.Order) error
-}
-
-func New(repo Repo, driver DriverService, broker Broker, cfg *config.Config) *Service {
+func New(repo Repo, driver DriverService, eventService EventService, analystService AnalystService, cfg *config.Config) *Service {
 	orderService := newOrderService()
 	service := &Service{
-		DriverService: driver,
-		Repo:          repo,
-		OrderService:  orderService,
-		broker:        broker,
-		Err:           make(chan error),
-		cfg:           cfg,
+		DriverService:  driver,
+		Repo:           repo,
+		OrderService:   orderService,
+		eventService:   eventService,
+		analystService: analystService,
+		Err:            make(chan error),
+		cfg:            cfg,
 	}
 
 	go service.Append()
@@ -204,7 +211,7 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 
 	s.Push <- driver
 
-	err = s.broker.Write(*order)
+	err = s.eventService.SendCompleteOrderEvent(*order)
 	if err != nil {
 		return nil, fmt.Errorf("broker write failed: %w", err)
 	}
@@ -251,7 +258,7 @@ func (s *Service) SetRatingService(ctx context.Context, input model.Rating, user
 				ID:   id,
 				Mark: float32(input.Rating),
 			}
-			return "", s.SetRating(ctx, &rating)
+			return "", s.analystService.SetRating(ctx, &rating)
 		}
 	}
 	return "", fmt.Errorf("order not found")

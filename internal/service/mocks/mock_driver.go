@@ -35,20 +35,6 @@ func (m *MockDriverService) EXPECT() *MockDriverServiceMockRecorder {
 	return m.recorder
 }
 
-// SetRating mocks base method.
-func (m *MockDriverService) SetRating(arg0 context.Context, arg1 *proto.Rating) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetRating", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetRating indicates an expected call of SetRating.
-func (mr *MockDriverServiceMockRecorder) SetRating(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRating", reflect.TypeOf((*MockDriverService)(nil).SetRating), arg0, arg1)
-}
-
 // SyncDriver mocks base method.
 func (m *MockDriverService) SyncDriver(arg0 context.Context, arg1 []*proto.Driver) ([]*proto.Driver, error) {
 	m.ctrl.T.Helper()

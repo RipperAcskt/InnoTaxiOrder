@@ -37,7 +37,8 @@ func TestCreateOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -75,7 +76,8 @@ func TestGetOrders(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -113,7 +115,8 @@ func TestCancelOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -151,7 +154,8 @@ func TestSetRating(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -189,7 +193,8 @@ func TestFind(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 

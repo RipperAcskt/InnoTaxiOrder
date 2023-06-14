@@ -33,9 +33,14 @@ func Run() error {
 		return fmt.Errorf("elastic new failed: %w", err)
 	}
 
-	client, err := client.New(cfg)
+	clientDriver, err := client.NewClientDriver(cfg)
 	if err != nil {
-		return fmt.Errorf("client new failed: %v", err)
+		return fmt.Errorf("client driver new failed: %v", err)
+	}
+
+	clientAnalyst, err := client.NewClientAnalyst(cfg)
+	if err != nil {
+		return fmt.Errorf("client analyst new failed: %v", err)
 	}
 
 	broker, err := broker.New(cfg)
@@ -43,7 +48,7 @@ func Run() error {
 		return fmt.Errorf("broker new failed: %w", err)
 	}
 
-	service := service.New(repo, client, broker, cfg)
+	service := service.New(repo, clientDriver, broker, clientAnalyst, cfg)
 
 	go func() {
 		err := <-service.Err
