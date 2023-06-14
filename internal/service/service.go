@@ -223,12 +223,13 @@ func (s *Service) SetRatingService(ctx context.Context, input model.Rating, user
 	var err error
 
 	userT := model.NewUserType(userType)
-	if userT == model.User {
+	switch userT {
+	case model.User:
 		orders, err = s.GetOrdersByUserID(ctx, userID, model.StatusFinished.String())
 		if err != nil {
 			return "", fmt.Errorf("get orders failed: %w", err)
 		}
-	} else if userT == model.Driver {
+	case model.Driver:
 		filters := model.OrderFilters{
 			DriverID: userID,
 		}
