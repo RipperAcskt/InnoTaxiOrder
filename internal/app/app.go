@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
+	"github.com/RipperAcskt/innotaxiorder/internal/broker"
 	"github.com/RipperAcskt/innotaxiorder/internal/client"
 	"github.com/RipperAcskt/innotaxiorder/internal/handler/graph"
 	"github.com/RipperAcskt/innotaxiorder/internal/handler/grpc"
@@ -32,12 +33,22 @@ func Run() error {
 		return fmt.Errorf("elastic new failed: %w", err)
 	}
 
-	client, err := client.New(cfg)
+	clientDriver, err := client.NewClientDriver(cfg)
 	if err != nil {
-		return fmt.Errorf("client new failed: %v", err)
+		return fmt.Errorf("client driver new failed: %v", err)
 	}
 
-	service := service.New(repo, client, cfg)
+	clientAnalyst, err := client.NewClientAnalyst(cfg)
+	if err != nil {
+		return fmt.Errorf("client analyst new failed: %v", err)
+	}
+
+	broker, err := broker.New(cfg)
+	if err != nil {
+		return fmt.Errorf("broker new failed: %w", err)
+	}
+
+	service := service.New(repo, clientDriver, broker, clientAnalyst, cfg)
 
 	go func() {
 		err := <-service.Err

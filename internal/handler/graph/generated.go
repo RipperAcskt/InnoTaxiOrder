@@ -49,21 +49,21 @@ type ComplexityRoot struct {
 		CancelOrder   func(childComplexity int, id string) int
 		CompleteOrder func(childComplexity int, input string) int
 		CreateOrder   func(childComplexity int, input model.OrderInfo) int
-		SetRaiting    func(childComplexity int, input model.Raiting) int
+		SetRating     func(childComplexity int, input model.Rating) int
 	}
 
 	Order struct {
-		Date          func(childComplexity int) int
-		DriverID      func(childComplexity int) int
-		DriverName    func(childComplexity int) int
-		DriverPhone   func(childComplexity int) int
-		DriverRaiting func(childComplexity int) int
-		From          func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Status        func(childComplexity int) int
-		TaxiType      func(childComplexity int) int
-		To            func(childComplexity int) int
-		UserID        func(childComplexity int) int
+		Date         func(childComplexity int) int
+		DriverID     func(childComplexity int) int
+		DriverName   func(childComplexity int) int
+		DriverPhone  func(childComplexity int) int
+		DriverRating func(childComplexity int) int
+		From         func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Status       func(childComplexity int) int
+		TaxiType     func(childComplexity int) int
+		To           func(childComplexity int) int
+		UserID       func(childComplexity int) int
 	}
 
 	Query struct {
@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateOrder(ctx context.Context, input model.OrderInfo) (*model.Order, error)
-	SetRaiting(ctx context.Context, input model.Raiting) (string, error)
+	SetRating(ctx context.Context, input model.Rating) (string, error)
 	CompleteOrder(ctx context.Context, input string) (*model.Order, error)
 	CancelOrder(ctx context.Context, id string) (*model.Order, error)
 }
@@ -136,17 +136,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateOrder(childComplexity, args["input"].(model.OrderInfo)), true
 
-	case "Mutation.SetRaiting":
-		if e.complexity.Mutation.SetRaiting == nil {
+	case "Mutation.SetRating":
+		if e.complexity.Mutation.SetRating == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_SetRaiting_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_SetRating_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetRaiting(childComplexity, args["input"].(model.Raiting)), true
+		return e.complexity.Mutation.SetRating(childComplexity, args["input"].(model.Rating)), true
 
 	case "Order.Date":
 		if e.complexity.Order.Date == nil {
@@ -176,12 +176,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.DriverPhone(childComplexity), true
 
-	case "Order.DriverRaiting":
-		if e.complexity.Order.DriverRaiting == nil {
+	case "Order.DriverRating":
+		if e.complexity.Order.DriverRating == nil {
 			break
 		}
 
-		return e.complexity.Order.DriverRaiting(childComplexity), true
+		return e.complexity.Order.DriverRating(childComplexity), true
 
 	case "Order.From":
 		if e.complexity.Order.From == nil {
@@ -272,7 +272,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputOrderFilters,
 		ec.unmarshalInputOrderInfo,
 		ec.unmarshalInputOrderState,
-		ec.unmarshalInputRaiting,
+		ec.unmarshalInputRating,
 	)
 	first := true
 
@@ -397,13 +397,13 @@ func (ec *executionContext) field_Mutation_CreateOrder_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_SetRaiting_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_SetRating_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Raiting
+	var arg0 model.Rating
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNRaiting2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐRaiting(ctx, tmp)
+		arg0, err = ec.unmarshalNRating2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐRating(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -577,8 +577,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateOrder(ctx context.Contex
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -607,8 +607,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateOrder(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_SetRaiting(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_SetRaiting(ctx, field)
+func (ec *executionContext) _Mutation_SetRating(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_SetRating(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -621,7 +621,7 @@ func (ec *executionContext) _Mutation_SetRaiting(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetRaiting(rctx, fc.Args["input"].(model.Raiting))
+		return ec.resolvers.Mutation().SetRating(rctx, fc.Args["input"].(model.Rating))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -638,7 +638,7 @@ func (ec *executionContext) _Mutation_SetRaiting(ctx context.Context, field grap
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_SetRaiting(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_SetRating(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -655,7 +655,7 @@ func (ec *executionContext) fieldContext_Mutation_SetRaiting(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_SetRaiting_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_SetRating_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -711,8 +711,8 @@ func (ec *executionContext) fieldContext_Mutation_CompleteOrder(ctx context.Cont
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -790,8 +790,8 @@ func (ec *executionContext) fieldContext_Mutation_CancelOrder(ctx context.Contex
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -1040,8 +1040,8 @@ func (ec *executionContext) fieldContext_Order_DriverPhone(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Order_DriverRaiting(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Order_DriverRaiting(ctx, field)
+func (ec *executionContext) _Order_DriverRating(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_DriverRating(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1054,7 +1054,7 @@ func (ec *executionContext) _Order_DriverRaiting(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DriverRaiting, nil
+		return obj.DriverRating, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1071,7 +1071,7 @@ func (ec *executionContext) _Order_DriverRaiting(ctx context.Context, field grap
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Order_DriverRaiting(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Order_DriverRating(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Order",
 		Field:      field,
@@ -1353,8 +1353,8 @@ func (ec *executionContext) fieldContext_Query_GetOrders(ctx context.Context, fi
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -1432,8 +1432,8 @@ func (ec *executionContext) fieldContext_Query_GetOrdersList(ctx context.Context
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -1511,8 +1511,8 @@ func (ec *executionContext) fieldContext_Query_CheckStatus(ctx context.Context, 
 				return ec.fieldContext_Order_DriverName(ctx, field)
 			case "DriverPhone":
 				return ec.fieldContext_Order_DriverPhone(ctx, field)
-			case "DriverRaiting":
-				return ec.fieldContext_Order_DriverRaiting(ctx, field)
+			case "DriverRating":
+				return ec.fieldContext_Order_DriverRating(ctx, field)
 			case "TaxiType":
 				return ec.fieldContext_Order_TaxiType(ctx, field)
 			case "From":
@@ -3591,14 +3591,14 @@ func (ec *executionContext) unmarshalInputOrderState(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRaiting(ctx context.Context, obj interface{}) (model.Raiting, error) {
-	var it model.Raiting
+func (ec *executionContext) unmarshalInputRating(ctx context.Context, obj interface{}) (model.Rating, error) {
+	var it model.Rating
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ID", "Raiting"}
+	fieldsInOrder := [...]string{"ID", "Rating"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3613,11 +3613,11 @@ func (ec *executionContext) unmarshalInputRaiting(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "Raiting":
+		case "Rating":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Raiting"))
-			it.Raiting, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Rating"))
+			it.Rating, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3663,10 +3663,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "SetRaiting":
+		case "SetRating":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_SetRaiting(ctx, field)
+				return ec._Mutation_SetRating(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -3746,9 +3746,9 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "DriverRaiting":
+		case "DriverRating":
 
-			out.Values[i] = ec._Order_DriverRaiting(ctx, field, obj)
+			out.Values[i] = ec._Order_DriverRating(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4403,8 +4403,8 @@ func (ec *executionContext) unmarshalNOrderInfo2githubᚗcomᚋRipperAcsktᚋinn
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNRaiting2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐRaiting(ctx context.Context, v interface{}) (model.Raiting, error) {
-	res, err := ec.unmarshalInputRaiting(ctx, v)
+func (ec *executionContext) unmarshalNRating2githubᚗcomᚋRipperAcsktᚋinnotaxiorderᚋinternalᚋmodelᚐRating(ctx context.Context, v interface{}) (model.Rating, error) {
+	res, err := ec.unmarshalInputRating(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

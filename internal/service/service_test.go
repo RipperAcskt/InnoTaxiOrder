@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/RipperAcskt/innotaxiorder/config"
+	"github.com/RipperAcskt/innotaxiorder/internal/broker"
 	"github.com/RipperAcskt/innotaxiorder/internal/model"
 	"github.com/RipperAcskt/innotaxiorder/internal/service"
 	"github.com/RipperAcskt/innotaxiorder/internal/service/mocks"
@@ -36,7 +37,8 @@ func TestCreateOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -74,7 +76,8 @@ func TestGetOrders(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo)
 
@@ -112,7 +115,8 @@ func TestCancelOrder(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -137,7 +141,7 @@ func TestSetRating(t *testing.T) {
 		{
 			name: "set raiting",
 			mockBehavior: func(s *mocks.MockRepo, s1 *mocks.MockDriverService) {
-				s.EXPECT().GetOrders(context.Background(), nil).Return(nil, nil)
+				s.EXPECT().GetOrdersByUserID(context.Background(), "", model.StatusFinished.String()).Return(nil, nil)
 			},
 			err: nil,
 		},
@@ -150,7 +154,8 @@ func TestSetRating(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 
@@ -159,7 +164,7 @@ func TestSetRating(t *testing.T) {
 				DriverService: DriverService,
 			}
 
-			_, err := service.SetRating(context.Background(), model.Raiting{}, "")
+			_, err := service.SetRatingService(context.Background(), model.Rating{}, "user", "")
 			assert.NotEqual(t, err, tt.err)
 		})
 	}
@@ -188,7 +193,8 @@ func TestFind(t *testing.T) {
 
 			repo := mocks.NewMockRepo(ctrl)
 			DriverRepo := mocks.NewMockDriverService(ctrl)
-			DriverService := service.New(repo, DriverRepo, &config.Config{SYNC_TIME: 10})
+			analyst := mocks.NewMockAnalystService(ctrl)
+			DriverService := service.New(repo, DriverRepo, &broker.Broker{}, analyst, &config.Config{SYNC_TIME: 10})
 
 			tt.mockBehavior(repo, DriverRepo)
 

@@ -14,14 +14,19 @@ type Config struct {
 
 	SERVER_HOST string `mapstructure:"SERVER_HOST"`
 
-	GRPC_USER_SERVICE_HOST  string `mapstructure:"GRPC_USER_SERVICE_HOST"`
-	GRPC_DIVER_SERVICE_HOST string `mapstructure:"GRPC_DIVER_SERVICE_HOST"`
+	GRPC_ANALYST_SERVICE_HOST string `mapstructure:"GRPC_ANALYST_SERVICE_HOST"`
+	GRPC_DIVER_SERVICE_HOST   string `mapstructure:"GRPC_DIVER_SERVICE_HOST"`
 
 	HS256_SECRET string `mapstructure:"HS256_SECRET"`
 
 	SYNC_TIME int `mapstructure:"SYNC_TIME"`
 
 	GRPC_HOST string `mapstructure:"GRPC_HOST"`
+
+	ADMIN_LOGIN string `mapstructure:"ADMIN_LOGIN"`
+	ADMIN_PASS  string `mapstructure:"ADMIN_PASS"`
+
+	KAFKA_HOST string `mapstructure:"KAFKA_HOST"`
 }
 
 func New() (*Config, error) {

@@ -12,6 +12,8 @@ import (
 
 //go:generate mockgen -destination=mocks/mock_service.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service Repo
 //go:generate mockgen -destination=mocks/mock_driver.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service DriverService
+//go:generate mockgen -destination=mocks/mock_event.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service EventService
+//go:generate mockgen -destination=mocks/mock_analyst.go -package=mocks github.com/RipperAcskt/innotaxiorder/internal/service AnalystService
 
 var (
 	ErrNotFoud = fmt.Errorf("not found")
@@ -21,8 +23,10 @@ type Service struct {
 	DriverService
 	Repo
 	*OrderService
-	Err chan error
-	cfg *config.Config
+	analystService AnalystService
+	eventService   EventService
+	Err            chan error
+	cfg            *config.Config
 }
 
 type Repo interface {
@@ -36,17 +40,26 @@ type Repo interface {
 
 type DriverService interface {
 	SyncDriver(ctx context.Context, drivers []*proto.Driver) ([]*proto.Driver, error)
-	SetRaiting(ctx context.Context, raiting *proto.Raiting, userType string) error
 }
 
-func New(repo Repo, driver DriverService, cfg *config.Config) *Service {
+type EventService interface {
+	SendCompleteOrderEvent(user model.Order) error
+}
+
+type AnalystService interface {
+	SetRating(ctx context.Context, raiting *proto.Rating) error
+}
+
+func New(repo Repo, driver DriverService, eventService EventService, analystService AnalystService, cfg *config.Config) *Service {
 	orderService := newOrderService()
 	service := &Service{
-		driver,
-		repo,
-		orderService,
-		make(chan error),
-		cfg,
+		DriverService:  driver,
+		Repo:           repo,
+		OrderService:   orderService,
+		eventService:   eventService,
+		analystService: analystService,
+		Err:            make(chan error),
+		cfg:            cfg,
 	}
 
 	go service.Append()
@@ -145,7 +158,7 @@ func (s *Service) Find(ctx context.Context, userID string) (*model.Order, error)
 		order.DriverID = driver.ID
 		order.DriverName = driver.Name
 		order.DriverPhone = driver.PhoneNumber
-		order.DriverRaiting = float64(driver.Raiting)
+		order.DriverRating = float64(driver.Rating)
 		order.Status = model.StatusFound
 		err = s.UpdateOrder(ctx, order)
 		if err != nil {
@@ -192,18 +205,41 @@ func (s *Service) CompleteOrder(ctx context.Context, userID string) (*model.Orde
 		ID:          order.DriverID,
 		Name:        order.DriverName,
 		PhoneNumber: order.DriverPhone,
-		Raiting:     float32(order.DriverRaiting),
+		Rating:      float32(order.DriverRating),
 		TaxiType:    order.TaxiType,
 	}
 
 	s.Push <- driver
+
+	err = s.eventService.SendCompleteOrderEvent(*order)
+	if err != nil {
+		return nil, fmt.Errorf("broker write failed: %w", err)
+	}
 	return order, nil
 }
 
-func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType string) (string, error) {
-	orders, err := s.GetOrders(ctx, nil)
-	if err != nil {
-		return "", fmt.Errorf("get orders failed: %w", err)
+func (s *Service) SetRatingService(ctx context.Context, input model.Rating, userType string, userID string) (string, error) {
+	var orders []*model.Order
+	var err error
+
+	userT := model.NewUserType(userType)
+	switch userT {
+	case model.User:
+		orders, err = s.GetOrdersByUserID(ctx, userID, model.StatusFinished.String())
+		if err != nil {
+			return "", fmt.Errorf("get orders failed: %w", err)
+		}
+	case model.Driver:
+		filters := model.OrderFilters{
+			DriverID: userID,
+		}
+		paggination := model.PagginationInfo{
+			PagginationFlag: false,
+		}
+		orders, err = s.GetOrderByFilter(ctx, filters, paggination)
+		if err != nil {
+			return "", fmt.Errorf("get orders failed: %w", err)
+		}
 	}
 
 	for i, order := range orders {
@@ -218,11 +254,12 @@ func (s *Service) SetRating(ctx context.Context, input model.Raiting, userType s
 			} else {
 				id = order.UserID
 			}
-			rating := proto.Raiting{
+			rating := proto.Rating{
+				Type: userType,
 				ID:   id,
-				Mark: int64(input.Raiting),
+				Mark: float32(input.Rating),
 			}
-			return "", s.SetRaiting(ctx, &rating, userType)
+			return "", s.analystService.SetRating(ctx, &rating)
 		}
 	}
 	return "", fmt.Errorf("order not found")
